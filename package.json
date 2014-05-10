@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "main": "app.js",
+  "bin": "server.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "loopback": "latest",
+    "loopback-connector-mongodb": "latest",
+    "fbgraph": "latest"
+  },
+  "optionalDependencies": {
+    "loopback-explorer": "latest",
+    "loopback-push-notification": "latest"
+  },
+  "name": "and"
+}
