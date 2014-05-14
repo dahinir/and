@@ -37,6 +37,14 @@
       "base": "Application"
     }
   },
+  "telegram": {
+    "dataSource": "db",
+    "public": true,
+    "properties": {
+      "condition": {"type": "Object", "required": false},
+      "data": {"type": "Object", "required": false}
+    }
+  },
   "acl": {
     "dataSource": "db",
     "public": false,
