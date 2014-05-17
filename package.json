@@ -8,7 +8,9 @@
   "dependencies": {
     "loopback": "latest",
     "loopback-connector-mongodb": "latest",
-    "fbgraph": "latest"
+    "underscore": "latest",
+    "fbgraph": "latest",
+    "compare-version": "latest"
   },
   "optionalDependencies": {
     "loopback-explorer": "latest",

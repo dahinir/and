@@ -1,3 +1,5 @@
+"use strict";
+
 var loopback = require('loopback');
 var path = require('path');
 var app = module.exports = loopback();
@@ -126,6 +128,17 @@ app.start = function() {
     var baseUrl = 'http://' + app.get('host') + ':' + app.get('port');
     app.emit('started', baseUrl);
     console.log('LoopBack server listening @ %s%s', baseUrl, '/');
+    // app.models.application.findById("com.dasolute.yotoo", function(err, instance){
+    //   console.log(JSON.stringify(instance));
+    // });
+    // app.models.applicationVersion.findById("536e56bd7482750000c4bc54", function(err, instance){
+    //   console.log(JSON.stringify(instance));
+    //   console.log(JSON.stringify(instance.application()));
+    //
+    //   instance.application(function(err,app){
+    //     console.log(JSON.stringify(app));
+    //   });
+    // });
   });
 };
 
@@ -165,9 +178,7 @@ function startPushServer() {
 
 // Pre-register an application that is ready to be used for testing.
 // You should tweak config options in ./config.js
-
   var config = require('./config');
-// console.log(config.apnsKeyData);
   var demoApp = {
     id: 'com.dasolute.yotoo',
     userId: 'dahini@dasolute.com',
