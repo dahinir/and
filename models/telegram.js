@@ -6,18 +6,11 @@ var _ = require('underscore');
 
 
 Telegram.mine = function(criteria, fn){
-  console.log("telegram/mine");
-  console.log(criteria);
   if ( typeof criteria === 'function'){
     fn = criteria;
     criteria = undefined;
   }
-
   var compareVersion = require('compare-version');
-// console.log(compareVersion('1.11.3', '1.11.25')); //  -1
-// console.log(compareVersion('1.11.3', '1.11.31')); //  -1
-
-
 
 
   var query = {
@@ -32,7 +25,6 @@ Telegram.mine = function(criteria, fn){
       debug('An error is reported from Telegram.findOne: %j', err);
       fn(defaultError);
     } else if(telegrams) {
-      // console.log(telegrams);
       var results = [];
       _.each(telegrams, function(tel){
         // criteria가 복잡해지면 underscore-query를 사용 할 것.
@@ -45,12 +37,10 @@ Telegram.mine = function(criteria, fn){
             results.push(tel);
         }
       });
-      console.log(results);
+      // console.log(results);
       return fn(undefined, {"results":results});
     }
   });
-
-  // return fn(undefined, {"af":1});
 };
 
 
