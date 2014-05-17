@@ -5,12 +5,12 @@ var Telegram = app.models.telegram;
 var _ = require('underscore');
 
 
-Telegram.mine = function(condition, fn){
+Telegram.mine = function(criteria, fn){
   console.log("telegram/mine");
-  console.log(condition);
-  if ( typeof condition === 'function'){
-    fn = condition;
-    condition = undefined;
+  console.log(criteria);
+  if ( typeof criteria === 'function'){
+    fn = criteria;
+    criteria = undefined;
   }
 
   var compareVersion = require('compare-version');
@@ -21,10 +21,10 @@ Telegram.mine = function(condition, fn){
 
 
   var query = {
-    "condition.appVersion.lte": { $gt: condition.appVersion }
+    "criteria.appVersion.lte": { $gt: criteria.appVersion }
   };
 
-  // load all telegram.. hm..
+  // load all telegrams.. hm..
   this.find({where: {}}, function(err, telegrams){
     var defaultError = new Error('telegram find failed');
 
@@ -35,12 +35,13 @@ Telegram.mine = function(condition, fn){
       // console.log(telegrams);
       var results = [];
       _.each(telegrams, function(tel){
+        // criteria가 복잡해지면 underscore-query를 사용 할 것.
         // lte, gt 조건은 없음!!
-        if( compareVersion(tel.condition.appVersion.lt, condition.appVersion) === 1 &&
-          compareVersion(tel.condition.appVersion.gte, condition.appVersion) <= 0 &&
-          ( !tel.condition.osname || tel.condition.osname == condition.osname) ){
-            tel.condition = undefined;
-            // delete tel.condition;  // why don't works?
+        if( compareVersion(tel.criteria.appVersion.lt, criteria.appVersion) === 1 &&
+          compareVersion(tel.criteria.appVersion.gte, criteria.appVersion) <= 0 &&
+          ( !tel.criteria.osname || tel.criteria.osname == criteria.osname) ){
+            tel.criteria = undefined;
+            // delete tel.criteria;  // why don't works?
             results.push(tel);
         }
       });
@@ -56,7 +57,7 @@ Telegram.mine = function(condition, fn){
 loopback.remoteMethod(Telegram.mine, {
   "http": {verb: "get"},
   "accepts": [
-    {arg: 'condition', type: 'object', required: true}
+    {arg: 'criteria', type: 'object', required: true}
   ],
   "returns": {
     arg: 'data', type: 'object', root: true
