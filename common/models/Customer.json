@@ -1,0 +1,13 @@
+{
+  "name": "Customer",
+  "base": "User",
+  "properties": {
+    "externalAccounts": {
+      "type": "Object",
+      "required": false
+    },
+    "favoriteMovie": {
+      "type": "string"
+    }
+  }
+}

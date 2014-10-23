@@ -1,13 +1,22 @@
 {
+  "name": "and",
   "version": "0.0.1",
-  "main": "app.js",
-  "bin": "server.js",
+  "main": "server/server.js",
   "scripts": {
-    "start": "node app.js"
+    "pretest": "jshint .",
+    "test": "mocha -R spec server/test"
   },
   "dependencies": {
-    "loopback": "latest",
+    "compression": "^1.0.3",
+    "errorhandler": "^1.1.1",
+    "loopback": "^2.0.0",
+    "loopback-boot": "^2.0.0",
+    "loopback-datasource-juggler": "^2.7.0",
     "loopback-connector-mongodb": "latest",
+    "serve-favicon": "^2.0.1",
+    "function-rate-limit": "~0.0.1",
+    "async": "~0.9.0",
+    "loopback-connector-rest": "^1.1.4",
     "underscore": "latest",
     "fbgraph": "latest",
     "compare-version": "latest"
@@ -16,5 +25,8 @@
     "loopback-explorer": "latest",
     "loopback-push-notification": "latest"
   },
-  "name": "and"
+  "devDependencies": {
+    "mocha": "^1.20.1",
+    "supertest": "^0.13.0"
+  }
 }

@@ -1,10 +1,16 @@
+module.exports = function(Customer) {
+};
+
+
+/* OLD SOURCE
+
 // http://docs.strongloop.com/display/DOC/Exposing+models+over+a+REST+API
 
 var loopback = require('loopback');
 var app = require('../app');
 var User = app.models.user;
 
-/* fb's long-lived token generally lasts about 60days */
+// fb's long-lived token generally lasts about 60days
 var fbgraph = require('fbgraph');
 // fbgraph.setAccessToken("191723324370677");
 // 4e4b5aaef0f9e457ab236af87d03b4c1
@@ -14,34 +20,34 @@ var fbgraph = require('fbgraph');
 //   console.log(res); // { id: '4', name: 'Mark Zuckerberg'... }
 // });
 
-/*
-var FB = require('fb');
-// https://developers.facebook.com/docs/facebook-login/access-tokens/
-FB.api('oauth/access_token', {
-    // client_id: '191723324370677',  // licky dev
-    // client_secret: '4e4b5aaef0f9e457ab236af87d03b4c1',
-    client_id: '536104426474071',    // licky product
-    client_secret: '9c8602bf85abfeb698f02ab7c6ebc34a',
-    grant_type: 'fb_exchange_token',
-    fb_exchange_token: 'CAAHnlYnnClcBAL8ZCZBqI0qWrQoIAkdH7M5YBRZAadNMLAkyTPaqIpE1Ty5Gs0yLK7XqDzojf4AqXHx6mme2Nss4NqnecKl9llAZBD34fFno31ASh1q5IfLxFLqXZCSq81LDZB9hFaZBg4blYVEIlu0UCvn62EMFFWQ8IVn5cuZBPp5XZB2OCEcYs'
-}, function (res) {
-    console.log(res);
 
-    if(!res || res.error) {
-        if(res.error.code == 190){
-          if( res.error.error_subcode == 467){
-            // Error validating access token: The session is invalid because the user logged out.
-            console.log("need login again");
-          }
-        }
-        // console.log(!res ? 'error occurred' : res.error);
-        return;
-    }
+// var FB = require('fb');
+// // https://developers.facebook.com/docs/facebook-login/access-tokens/
+// FB.api('oauth/access_token', {
+//     // client_id: '191723324370677',  // licky dev
+//     // client_secret: '4e4b5aaef0f9e457ab236af87d03b4c1',
+//     client_id: '536104426474071',    // licky product
+//     client_secret: '9c8602bf85abfeb698f02ab7c6ebc34a',
+//     grant_type: 'fb_exchange_token',
+//     fb_exchange_token: 'CAAHnlYnnClcBAL8ZCZBqI0qWrQoIAkdH7M5YBRZAadNMLAkyTPaqIpE1Ty5Gs0yLK7XqDzojf4AqXHx6mme2Nss4NqnecKl9llAZBD34fFno31ASh1q5IfLxFLqXZCSq81LDZB9hFaZBg4blYVEIlu0UCvn62EMFFWQ8IVn5cuZBPp5XZB2OCEcYs'
+// }, function (res) {
+//     console.log(res);
+//
+//     if(!res || res.error) {
+//         if(res.error.code == 190){
+//           if( res.error.error_subcode == 467){
+//             // Error validating access token: The session is invalid because the user logged out.
+//             console.log("need login again");
+//           }
+//         }
+//         // console.log(!res ? 'error occurred' : res.error);
+//         return;
+//     }
+//
+//     var accessToken = res.access_token;
+//     var expires = res.expires ? res.expires : 0;
+// });
 
-    var accessToken = res.access_token;
-    var expires = res.expires ? res.expires : 0;
-});
-*/
 
 // A remote method must accept a callback with the conventional fn(err, result, ...) signature.
 User.externalAccountLogin = function(credentials, include, fn){
@@ -93,3 +99,4 @@ loopback.remoteMethod(User.externalAccountLogin, {
     arg: 'accessToken', type: 'object', root: true
   }
 });
+*/

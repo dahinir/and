@@ -6,4 +6,5 @@ tmp
 tokens.js
 node_modules/
 credentials/
+strongloop.json
 

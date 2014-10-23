@@ -1,30 +1,39 @@
 "use strict";
 
 var loopback = require('loopback');
-var path = require('path');
+var boot = require('loopback-boot');
 var app = module.exports = loopback();
+
+var path = require('path');
 var started = new Date();
 
-/*
- * 1. Configure LoopBack models and datasources
- *
- * Read more at http://apidocs.strongloop.com/loopback#appbootoptions
- */
+console.log("======");
+console.log(app.get('env'));
+console.log("======");
 
-app.boot(__dirname);
+// Set up the /favicon.ico
+app.use(loopback.favicon());
+
+// request pre-processing middleware
+app.use(loopback.compress());
+
+// -- Add your pre-processing middleware here --
+
+// boot scripts mount components like REST API
+boot(app, __dirname);
+
 
 /*
  * 2. Configure request preprocessing
  *
  *  LoopBack support all express-compatible middleware.
- */
-console.log(app.get('env'));
-app.use(loopback.favicon());
+ *
 app.use(loopback.logger(app.get('env') === 'development' ? 'dev' : 'default'));
 app.use(loopback.cookieParser(app.get('cookieSecret')));
 app.use(loopback.token({model: app.models.accessToken}));
 app.use(loopback.bodyParser());
 app.use(loopback.methodOverride());
+*/
 
 /*
  * EXTENSION POINT
@@ -35,8 +44,7 @@ app.use(loopback.methodOverride());
 
 /*
  * 3. Setup request handlers.
- */
-
+ *
 // LoopBack REST interface
 app.use(app.get('restApiRoot'), loopback.rest());
 
@@ -52,6 +60,7 @@ try {
     'Run `npm install loopback-explorer` to enable the LoopBack explorer'
   );
 }
+*/
 
 /*
  * EXTENSION POINT
@@ -70,21 +79,23 @@ try {
 // by any of the middleware registered above.
 // This way LoopBack REST and API Explorer take precedence over
 // express routes.
-app.use(app.router);
+// app.use(app.router);
 
-// The static file server should come after all other routes
-// Every request that goes through the static middleware hits
-// the file system to check if a file exists.
-app.use(loopback.static(path.join(__dirname, 'public')));
+// -- Mount static files here--
+// All static middleware should be registered at the end, as all requests
+// passing the static middleware are hitting the file system
+// Example:
+//   var path = require('path');
+//   app.use(loopback.static(path.resolve(__dirname, '../client')));
+var websitePath = path.resolve(__dirname, '../client');
+app.use(loopback.static(websitePath));
 
 // Requests that get this far won't be handled
 // by any middleware. Convert them into a 404 error
 // that will be handled later down the chain.
 app.use(loopback.urlNotFound());
 
-/*
- * 4. Setup error handling strategy
- */
+
 
 /*
  * EXTENSION POINT
@@ -95,10 +106,10 @@ app.use(loopback.urlNotFound());
  *     next(err);
  *   });
  */
-
 // The ultimate error handler.
 app.use(loopback.errorHandler());
 
+////////////////////////////////////
 
 /*
  * 5. Add a basic application status route at the root `/`.
@@ -258,7 +269,7 @@ function startPushServer() {
     );
   }
 }
-startPushServer();
+// startPushServer();
 /* noti end */
 
 if(require.main === module) {
