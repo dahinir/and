@@ -29,5 +29,9 @@
   "Customer": {
     "dataSource": "db",
     "public": true
+  },
+  "Telegram": {
+    "dataSource": "db",
+    "public": true
   }
 }
