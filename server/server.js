@@ -7,6 +7,20 @@ var app = module.exports = loopback();
 var path = require('path');
 var started = new Date();
 
+// Passport configurators..
+var loopbackPassport = require('loopback-component-passport');
+var PassportConfigurator = loopbackPassport.PassportConfigurator;
+var passportConfigurator = new PassportConfigurator(app);
+
+/*
+ * body-parser is a piece of express middleware that
+ *   reads a form's input and stores it as a javascript
+ *   object accessible through `req.body`
+ */
+var bodyParser = require('body-parser');
+
+
+
 console.log("======");
 console.log(app.get('env'));
 console.log("======");
@@ -18,9 +32,54 @@ app.use(loopback.favicon());
 app.use(loopback.compress());
 
 // -- Add your pre-processing middleware here --
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
 
 // boot scripts mount components like REST API
 boot(app, __dirname);
+
+// to support JSON-encoded bodies
+app.use(bodyParser.json());
+// to support URL-encoded bodies
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
+
+// The access token is only available after boot
+app.use(loopback.token({
+  model: app.models.accessToken
+}));
+
+// Enable http session
+app.use(loopback.cookieParser(app.get('cookieSecret')));
+app.use(loopback.session({
+	secret: 'kittycat',
+	saveUninitialized: true,
+	resave: true
+}));
+passportConfigurator.init();
+
+passportConfigurator.setupModels({
+	userModel: app.models.Customer,
+	userIdentityModel: app.models.CustomerIdentity,
+	userCredentialModel: app.models.CustomerCredential
+});
+
+// attempt to build the providers/passport config
+var passportConfig = {};
+try {
+  passportConfig = require('../credentials/providers.json');
+} catch (err) {
+  console.trace(err);
+  process.exit(1); // fatal
+}
+
+for (var s in passportConfig) {
+	var c = passportConfig[s];
+	c.session = c.session !== false;
+	passportConfigurator.configureProvider(s, c);
+}
+var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 
 
 /*
@@ -75,6 +134,32 @@ try {
  *   });
  */
 
+
+
+////////////////////////////////////
+
+/*
+ * 5. Add a basic application status route at the root `/`.
+ *
+ * (remove this to handle `/` on your own)
+ */
+app.get('/', loopback.status());
+
+// passport examples
+app.get('/l', function(req, res, next) {
+  res.render('index', {user: req.user});
+});
+app.get('/auth/account', ensureLoggedIn('/passport/login.html'), function(req, res, next) {
+  res.render('loginProfiles', {user: req.user});
+});
+app.get('/link/account', ensureLoggedIn('/passport/login.html'), function(req, res, next) {
+  res.render('linkedAccounts', {user: req.user});
+});
+app.get('/auth/logout', function(req, res, next) {
+  req.logout();
+  res.redirect('/');
+});
+
 // Let express routes handle requests that were not handled
 // by any of the middleware registered above.
 // This way LoopBack REST and API Explorer take precedence over
@@ -108,16 +193,6 @@ app.use(loopback.urlNotFound());
  */
 // The ultimate error handler.
 app.use(loopback.errorHandler());
-
-////////////////////////////////////
-
-/*
- * 5. Add a basic application status route at the root `/`.
- *
- * (remove this to handle `/` on your own)
- */
-
-app.get('/', loopback.status());
 
 /*
  * 6. Enable access control and token based authentication.

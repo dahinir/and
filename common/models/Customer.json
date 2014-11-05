@@ -9,5 +9,26 @@
     "favoriteMovie": {
       "type": "string"
     }
-  }
+  },
+
+  "relations": {
+    "accessTokens": {
+      "type": "hasMany",
+      "model": "AccessToken",
+      "foreignKey": "userId"
+    },
+    "identities": {
+      "type": "hasMany",
+      "model": "CustomerIdentity",
+      "foreignKey": "userId"
+    },
+    "credentials": {
+      "type": "hasMany",
+      "model": "CustomerCredential",
+      "foreignKey": "userId"
+    }
+  },
+  "validations": [],
+  "acls": [],
+  "methods": []
 }
