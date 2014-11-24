@@ -1,7 +1,7 @@
 {
   "restApiRoot": "/api",
   "host": "0.0.0.0",
-  "port": 80,
+  "port": 3030,
   "cookieSecret": "dfe52c1e-d6d7-4acf-a6dc-38ea1260c700",
-  "url": "http://localhost:80/"
+  "url": "http://localhost:3030/"
 }

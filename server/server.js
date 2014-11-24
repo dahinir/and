@@ -12,6 +12,8 @@ var loopbackPassport = require('loopback-component-passport');
 var PassportConfigurator = loopbackPassport.PassportConfigurator;
 var passportConfigurator = new PassportConfigurator(app);
 
+var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
+
 /*
  * body-parser is a piece of express middleware that
  *   reads a form's input and stores it as a javascript
@@ -31,6 +33,13 @@ app.use(loopback.favicon());
 // request pre-processing middleware
 app.use(loopback.compress());
 
+// The access token is only available after boot
+// but in 'http://docs.strongloop.com/display/public/LB/Making+authenticated+requests'
+// To use cookies for authentication, add the following to server.js (before boot):
+app.use(loopback.token({
+	model: app.models.AccessToken
+}));
+
 // -- Add your pre-processing middleware here --
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -45,10 +54,7 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-// The access token is only available after boot
-app.use(loopback.token({
-  model: app.models.accessToken
-}));
+
 
 // Enable http session
 app.use(loopback.cookieParser(app.get('cookieSecret')));
@@ -57,6 +63,7 @@ app.use(loopback.session({
 	saveUninitialized: true,
 	resave: true
 }));
+
 passportConfigurator.init();
 
 passportConfigurator.setupModels({
@@ -64,6 +71,8 @@ passportConfigurator.setupModels({
 	userIdentityModel: app.models.CustomerIdentity,
 	userCredentialModel: app.models.CustomerCredential
 });
+
+
 
 // attempt to build the providers/passport config
 var passportConfig = {};
@@ -79,7 +88,7 @@ for (var s in passportConfig) {
 	c.session = c.session !== false;
 	passportConfigurator.configureProvider(s, c);
 }
-var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
+
 
 
 /*
@@ -143,14 +152,17 @@ try {
  *
  * (remove this to handle `/` on your own)
  */
-app.get('/', loopback.status());
+app.get('/status', loopback.status());
 
 // passport examples
-app.get('/l', function(req, res, next) {
+app.get('/loo', function(req, res, next) {
   res.render('index', {user: req.user});
 });
+// expose logined self profile
 app.get('/auth/account', ensureLoggedIn('/passport/login.html'), function(req, res, next) {
-  res.render('loginProfiles', {user: req.user});
+	// should forward "/twitter/1643461" or "facebook/63441324" "/twitter/dahinir"같은건 추후 지원
+	console.log("/auth/account " + JSON.stringify(req.query));
+  res.render('loginProfiles', {user: req.user, token: req.accessToken, tokenSecret: req.secret});
 });
 app.get('/link/account', ensureLoggedIn('/passport/login.html'), function(req, res, next) {
   res.render('linkedAccounts', {user: req.user});
@@ -159,6 +171,20 @@ app.get('/auth/logout', function(req, res, next) {
   req.logout();
   res.redirect('/');
 });
+
+// test
+app.get('/test', function(req, res, next){
+	console.log('test!!		');
+	console.log( req.user);
+	// console.log(JSON.stringify(req.headers));
+	// console.log(req.headers['user-agent']);
+	// res.render('loginProfiles', {user: req.user, token: req.accessToken, tokenSecret: req.secret});
+});
+
+// app.models.CustomerIdentity.belongsTo(app.models.Customer, {as: 'author', foreignKey: 'userId'});
+
+
+
 
 // Let express routes handle requests that were not handled
 // by any of the middleware registered above.
@@ -172,8 +198,7 @@ app.get('/auth/logout', function(req, res, next) {
 // Example:
 //   var path = require('path');
 //   app.use(loopback.static(path.resolve(__dirname, '../client')));
-var websitePath = path.resolve(__dirname, '../client');
-app.use(loopback.static(websitePath));
+app.use(loopback.static( path.resolve(__dirname, '../client') ));
 
 // Requests that get this far won't be handled
 // by any middleware. Convert them into a 404 error
@@ -198,10 +223,16 @@ app.use(loopback.errorHandler());
  * 6. Enable access control and token based authentication.
  */
 
-var swaggerRemote = app.remotes().exports.swagger;
-if (swaggerRemote) swaggerRemote.requireToken = false;
+// var swaggerRemote = app.remotes().exports.swagger;
+// if (swaggerRemote) {
+// 	console.log("swaggerRemote!!");
+// 	swaggerRemote.requireToken = false;
+// }else{
+// 	console.log("none swaggerRemote. maybe loopback 1.xx??");
+// }
 
-app.enableAuth();
+// move to boot/authentication.js
+// app.enableAuth();
 
 /*
  * 7. Optionally start the server
@@ -210,6 +241,7 @@ app.enableAuth();
  */
 
 app.start = function() {
+	console.log("app.start ");
   return app.listen(function() {
     var baseUrl = 'http://' + app.get('host') + ':' + app.get('port');
     app.emit('started', baseUrl);
@@ -225,6 +257,10 @@ app.start = function() {
     //     console.log(JSON.stringify(app));
     //   });
     // });
+		// app.models.Customer.hasMany('chapters', {model: app.models.CustomerIdentity});
+		// app.models.Customer.hasMany(app.models.AccessToken, {as: 'identy', foreignKey: 'userId'});
+
+		// console.log(app.models);
   });
 };
 

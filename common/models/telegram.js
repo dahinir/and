@@ -39,9 +39,7 @@ module.exports = function(Telegram) {
     });
   };
 
-  Telegram.remoteMethod(
-    "mine",
-    {
+  Telegram.remoteMethod("mine", {
       "http": {verb: "get"},
       "accepts": [
         {arg: 'criteria', type: 'object', required: true}
@@ -49,8 +47,7 @@ module.exports = function(Telegram) {
       "returns": {
         arg: 'data', type: 'object', root: true
       }
-    }
-  );
+  });
 };
 
 

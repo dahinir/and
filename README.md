@@ -3,7 +3,7 @@ and
 
 and for yotoo
 
-$ forever start -w
+$ forever start -w server/server.js 
 
 * before distribution
   * application model public false( certData!!)

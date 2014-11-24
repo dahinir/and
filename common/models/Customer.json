@@ -2,15 +2,11 @@
   "name": "Customer",
   "base": "User",
   "properties": {
-    "externalAccounts": {
-      "type": "Object",
-      "required": false
-    },
     "favoriteMovie": {
-      "type": "string"
+      "type": "string",
+      "required": false
     }
   },
-
   "relations": {
     "accessTokens": {
       "type": "hasMany",
@@ -29,6 +25,25 @@
     }
   },
   "validations": [],
-  "acls": [],
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__credentials"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__identities"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "externalAccounts"
+    }
+  ],
   "methods": []
 }

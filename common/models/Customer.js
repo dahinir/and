@@ -1,4 +1,64 @@
 module.exports = function(Customer) {
+  var app = require('../../server/server');
+
+
+  // 사용하지 않음. 그냥 테스트
+  Customer.externalAccounts = function(userId, callback){
+    var credentials = [];
+    console.log("arg:" + userId);
+    // console.log(Customer.__get__identities());
+
+    console.log("---");
+    // console.log(Customer.app.models.CustomerCredential);
+    // console.log("req.user:" );
+    // console.log("this:" + JSON.stringify(Object.getOwnPropertyNames(Customer)) );
+
+    Customer.findById(userId, function(err, customer) {
+      console.log(customer);
+      // customer.app.models.CustomerIdentity.author(function(){
+      //   console.log(arguments);
+      // });
+
+      // if (err) return callback(err);
+      // if (project.balance >= amount) {
+      //   project.balance -= amount;
+      // }
+      // else {
+      //   project.balance = 0;
+      // }
+      // project.save();
+
+      // console.log(customer);
+      // callback(null, customer);
+    });
+
+    return callback(undefined, {"results": credentials});
+  };
+
+  Customer.remoteMethod("externalAccounts", {
+    "http": { verb: "get"},
+    "accepts": [
+      {
+        arg: 'access_token',
+        type: 'string',
+        required: true,
+        http: function(ctx){
+          console.log(ctx.req.accessToken.userId);
+          // console.log(ctx.req);
+          console.log(app.models.AccessToken.findForRequest(ctx.req));
+          console.log("--------------");
+          // console.log(Customer);
+          return ctx.req.accessToken.userId;
+        },
+        description: 'Do not supply this argument, it is automatically extracted ' +
+          'from request headers. -by dahinir'
+      }
+    ],
+    "returns": {
+      arg: 'data', type: 'object'//, root: false
+    }
+  });
+
 };
 
 
