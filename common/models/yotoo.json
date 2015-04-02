@@ -1,0 +1,28 @@
+{
+  "name": "Yotoo",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "required": true
+    },
+    "senderId": {
+      "type":"string",
+      "required": true
+    },
+    "receiverId": {
+      "type":"string",
+      "required": true
+    },
+    "created": "date"
+  },
+  "relations": {
+    "owner": {
+      "type": "belongsTo",
+      "model": "Customer",
+      "foreignKey": "customerId"
+    }
+  },
+  "validations": [],
+  "acls": [],
+  "methods": []
+}

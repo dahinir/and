@@ -1,7 +1,13 @@
 {
   "name": "Telegram",
   "properties": {
-    "criteria": {"type": "Object", "required": false},
-    "data": {"type": "Object", "required": false}
+    "criteria": {
+      "type": "Object",
+      "required": false
+    },
+    "data": {
+      "type": "Object",
+      "required": false
+    }
   }
 }

@@ -26,8 +26,13 @@ module.exports = function(CustomerIdentity) {
         required: true,
         http: function(ctx){
           // var userId = "ThereIsNoUserId";
-          // if(ctx.req.accessToken && ctx.req.accessToken.userId)
-          //   userId = ctx.req.accessToken.userId;
+          // if(ctx.req.accessToken ){
+            // console.log(ctx.req.accessToken.userId);
+          // }else{
+            // console.log("no user accessToken");
+          // }
+          // console.log(ctx.req.accessToken);
+
           return ctx.req;
         },
         description: 'Do not supply this argument, it is automatically extracted ' +

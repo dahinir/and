@@ -1,0 +1,33 @@
+<html>
+<head>
+  <meta id="yt:access_token" content=<%= accessToken %> >
+  <meta id="yt:id" content=<%= user.id %> >
+  <meta id="tw:id" content=<%= user.profiles[0].credentials.token %> >
+  <meta id="tw:access_token" content=<%= user.profiles[0].credentials.token %> >
+  <meta id="tw:access_token_secret" content=<%= user.profiles[0].credentials.tokenSecret %> >
+</head>
+<body>
+
+
+  <h1>w</h1>
+
+  <h2>LoopBack User</h2>
+  User Id: <%= user.id %><br/>
+  User Name: <%= user.username %><br/>
+  EMail: <%= user.email %>
+
+  <h2>Third Party Profiles</h2>
+  <%= JSON.stringify(user) %>
+<hr />
+  <p>
+    <%= JSON.stringify(user.profiles) %>
+    <p>
+
+      <p>
+
+        <p>
+          <a href="/api/CustomerIdentities/findOneForRequest">custom identities</a><br />
+          <a href='/auth/logout'>Logout</a><br/>
+          <a href='/'>Home</a>
+</body>
+</html>

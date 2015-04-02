@@ -36,11 +36,16 @@
     "public": true
   },
 
+
+  "Telegram": {
+    "dataSource": "db",
+    "public": true
+  },
   "Customer": {
     "dataSource": "db",
     "public": true
   },
-  "Telegram": {
+  "Yotoo": {
     "dataSource": "db",
     "public": true
   }

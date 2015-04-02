@@ -14,18 +14,11 @@ var passportConfigurator = new PassportConfigurator(app);
 
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 
-/*
- * body-parser is a piece of express middleware that
- *   reads a form's input and stores it as a javascript
- *   object accessible through `req.body`
- */
-var bodyParser = require('body-parser');
-
-
 
 console.log("======");
 console.log(app.get('env'));
-console.log("======");
+console.log("------");
+
 
 // Set up the /favicon.ico
 app.use(loopback.favicon());
@@ -33,10 +26,17 @@ app.use(loopback.favicon());
 // request pre-processing middleware
 app.use(loopback.compress());
 
+
 // The access token is only available after boot
 // but in 'http://docs.strongloop.com/display/public/LB/Making+authenticated+requests'
 // To use cookies for authentication, add the following to server.js (before boot):
+// http://apidocs.strongloop.com/loopback/#loopback-token
+// [req.accessToken] will attached by rest-api.js NOT THIS.
+// [req.signedCookies.access_token] will atached
 app.use(loopback.token({
+	// cookies: ['authorization'],
+	// headers: ['authorization', 'X-Access-Token'],
+	// params: ['access_token'],
 	model: app.models.AccessToken
 }));
 
@@ -44,9 +44,32 @@ app.use(loopback.token({
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
+// just for test
+var reqCallCount = 0;
+app.get('*', function(req, res, next){
+	console.log("===================="+ ++reqCallCount +": "+ req.hostname + req.path);
+	console.log("[server.js] req.headers" );
+	console.log(req.headers);
+
+	console.log("[server.js] req.signedCookies");
+	console.log(req.signedCookies);
+
+	next();
+});
+
+/*
+ * Time To Boot Scripts!
+ */
 // boot scripts mount components like REST API
 boot(app, __dirname);
 
+
+/*
+* body-parser is a piece of express middleware that
+*   reads a form's input and stores it as a javascript
+*   object accessible through `req.body`
+*/
+var bodyParser = require('body-parser');
 // to support JSON-encoded bodies
 app.use(bodyParser.json());
 // to support URL-encoded bodies
@@ -55,15 +78,23 @@ app.use(bodyParser.urlencoded({
 }));
 
 
-
 // Enable http session
 app.use(loopback.cookieParser(app.get('cookieSecret')));
+
+// be sure to use express.session() before passport.session()
+// to ensure that the login session is restored in the correct order.
+// http://passportjs.org/guide/configure/
+// [req.session] attach!
 app.use(loopback.session({
 	secret: 'kittycat',
 	saveUninitialized: true,
 	resave: true
 }));
 
+
+/*
+ * passport
+ */
 passportConfigurator.init();
 
 passportConfigurator.setupModels({
@@ -71,8 +102,6 @@ passportConfigurator.setupModels({
 	userIdentityModel: app.models.CustomerIdentity,
 	userCredentialModel: app.models.CustomerCredential
 });
-
-
 
 // attempt to build the providers/passport config
 var passportConfig = {};
@@ -86,6 +115,7 @@ try {
 for (var s in passportConfig) {
 	var c = passportConfig[s];
 	c.session = c.session !== false;
+	// console.log("sex:"+ c.session);
 	passportConfigurator.configureProvider(s, c);
 }
 
@@ -146,42 +176,46 @@ try {
 
 
 ////////////////////////////////////
-
+// app.get(function(req, res, next){
+// 	console.log("asdfasdfasdf");
+// 	console.log(req.session);
+// });
 /*
  * 5. Add a basic application status route at the root `/`.
  *
  * (remove this to handle `/` on your own)
  */
+app.get('*', function(req, res, next){
+	console.log("[server.js] req.session");
+	console.log(req.session);
+
+	console.log("[server.js] req.user");
+	console.log(req.user);
+	console.log("----------------end-" + reqCallCount +": "+ req.hostname + req.path);
+	next();
+});
 app.get('/status', loopback.status());
 
-// passport examples
-app.get('/loo', function(req, res, next) {
-  res.render('index', {user: req.user});
-});
 // expose logined self profile
 app.get('/auth/account', ensureLoggedIn('/passport/login.html'), function(req, res, next) {
 	// should forward "/twitter/1643461" or "facebook/63441324" "/twitter/dahinir"같은건 추후 지원
-	console.log("/auth/account " + JSON.stringify(req.query));
-  res.render('loginProfiles', {user: req.user, token: req.accessToken, tokenSecret: req.secret});
-});
-app.get('/link/account', ensureLoggedIn('/passport/login.html'), function(req, res, next) {
-  res.render('linkedAccounts', {user: req.user});
+  res.render('loginProfiles', {user: req.user});
 });
 app.get('/auth/logout', function(req, res, next) {
   req.logout();
   res.redirect('/');
 });
-
-// test
-app.get('/test', function(req, res, next){
-	console.log('test!!		');
-	console.log( req.user);
-	// console.log(JSON.stringify(req.headers));
-	// console.log(req.headers['user-agent']);
-	// res.render('loginProfiles', {user: req.user, token: req.accessToken, tokenSecret: req.secret});
+app.get('/auth/success', ensureLoggedIn('/passport/login.html'), function(req, res){
+	// 로긴 시도 전 페이지가 리퀘스트에 있으면 그쪽으로, 없으면 그냥 프로필 페이지로 포워딩하는 코드 필요.
+	// http://stackoverflow.com/questions/18136323/forward-request-to-alternate-request-handler-instead-of-redirect
+	res.render('loginSuccess', {
+		user: req.user,
+		accessToken: req.signedCookies.access_token
+	});
 });
-
-// app.models.CustomerIdentity.belongsTo(app.models.Customer, {as: 'author', foreignKey: 'userId'});
+app.get('/auth/accessToken', function(req, res){
+	// req.signedCookies.access_token
+});
 
 
 
