@@ -1,6 +1,6 @@
 {
-  "name": "CustomerCredential",
-  "base": "UserCredential",
+  "name": "Car",
+  "base": "PersistedModel",
   "properties": {},
   "validations": [],
   "relations": {

@@ -27,6 +27,10 @@
     "public": true
   },
 
+  "CustomerAccessToken": {
+    "dataSource": "db",
+    "public": false
+  },
   "CustomerCredential": {
     "dataSource": "db",
     "public": true

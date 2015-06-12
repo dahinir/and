@@ -10,18 +10,18 @@
   "relations": {
     "accessTokens": {
       "type": "hasMany",
-      "model": "AccessToken",
-      "foreignKey": "userId"
+      "model": "CustomerAccessToken",
+      "foreignKey": "customerId"
     },
     "identities": {
       "type": "hasMany",
       "model": "CustomerIdentity",
-      "foreignKey": "userId"
+      "foreignKey": "customerId"
     },
     "credentials": {
       "type": "hasMany",
       "model": "CustomerCredential",
-      "foreignKey": "userId"
+      "foreignKey": "customerId"
     }
   },
   "validations": [],

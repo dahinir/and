@@ -1,6 +1,6 @@
 {
-  "name": "CustomerCredential",
-  "base": "UserCredential",
+  "name": "CustomerAccessToken",
+  "base": "AccessToken",
   "properties": {},
   "validations": [],
   "relations": {

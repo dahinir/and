@@ -37,7 +37,7 @@ app.use(loopback.token({
 	// cookies: ['authorization'],
 	// headers: ['authorization', 'X-Access-Token'],
 	// params: ['access_token'],
-	model: app.models.AccessToken
+	model: app.models.CustomerAccessToken
 }));
 
 // -- Add your pre-processing middleware here --
