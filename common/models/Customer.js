@@ -10,6 +10,22 @@ module.exports = function(Customer) {
     next();
   });
 
+  // prevent password hashes from being sent to clients
+  Customer.afterRemote('**', function (ctx, customer, next) {
+    if(ctx.result) {
+      if(Array.isArray(ctx.result)) {
+        ctx.result.forEach(function (result) {
+          // delete result.password;
+          result.afterRemote = true;
+        });
+      } else {
+          result.afterRemote = true;
+      }
+    }
+
+    next();
+  });
+
   // 사용하지 않음. 그냥 테스트
   Customer.externalAccounts = function(userId, callback){
     var credentials = [];
