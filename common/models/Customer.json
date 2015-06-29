@@ -11,17 +11,17 @@
     "accessTokens": {
       "type": "hasMany",
       "model": "CustomerAccessToken",
-      "foreignKey": "customerId"
+      "foreignKey": "userId"
     },
     "identities": {
       "type": "hasMany",
       "model": "CustomerIdentity",
-      "foreignKey": "customerId"
+      "foreignKey": "userId"
     },
     "credentials": {
       "type": "hasMany",
       "model": "CustomerCredential",
-      "foreignKey": "customerId"
+      "foreignKey": "userId"
     }
   },
   "validations": [],

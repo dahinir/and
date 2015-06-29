@@ -26,6 +26,8 @@ app.use(loopback.favicon());
 // request pre-processing middleware
 app.use(loopback.compress());
 
+// http://docs.strongloop.com/display/public/LB/Using+current+context
+// app.use(loopback.context());
 
 // The access token is only available after boot
 // but in 'http://docs.strongloop.com/display/public/LB/Making+authenticated+requests'
@@ -48,14 +50,15 @@ app.set('view engine', 'ejs');
 var reqCallCount = 0;
 app.get('*', function(req, res, next){
 	console.log("===================="+ ++reqCallCount +": "+ req.hostname + req.path);
-	console.log("[server.js] req.headers" );
+	console.log("[server.js] req.headers ---" );
 	console.log(req.headers);
 
-	console.log("[server.js] req.signedCookies");
+	console.log("[server.js] req.signedCookies ---");
 	console.log(req.signedCookies);
 
 	next();
 });
+
 
 /*
  * Time To Boot Scripts!
@@ -186,10 +189,10 @@ try {
  * (remove this to handle `/` on your own)
  */
 app.get('*', function(req, res, next){
-	console.log("[server.js] req.session");
+	console.log("[server.js] req.session ---");
 	console.log(req.session);
 
-	console.log("[server.js] req.user");
+	console.log("[server.js] req.user ---");
 	console.log(req.user);
 	console.log("----------------end-" + reqCallCount +": "+ req.hostname + req.path);
 	next();

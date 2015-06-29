@@ -1,7 +1,28 @@
 var _ = require('underscore');
 
 module.exports = function(Telegram) {
+  // Telegram.observe('access', function logQuery(ctx, next) {
+  //   console.log("ahsdfhawielnca;sasdd=====");
+  //   console.log(ctx.instance );
+  //   console.log(ctx.data);
+  //   console.log(ctx.res);
+  //   console.log(ctx.req);
+  //   console.log("ahsdfhawieln===");
+  //
+  //   var loopback = require('loopback');
+  //   var ctx = loopback.getCurrentContext();
+  //   // Get the current access token
+  //   var accessToken = ctx.get('accessToken');
+  //   console.log(accessToken );
+  //
+  //   var currentUser = ctx && ctx.get('currentUser');
+  //   console.log('currentUser.username: ', currentUser); // voila!
+  //   // console.log('Accessing %s matching %s', ctx.Model.modelName, ctx.query.where);
+  //   next();
+  // });
+
   Telegram.mine = function(criteria, callback){
+    console.log("TELEGRAM   dd");
     if ( typeof criteria === 'function'){
       callback = criteria;
       criteria = undefined;
