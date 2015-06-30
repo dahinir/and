@@ -10,12 +10,12 @@
   "relations": {
     "identities": {
       "type": "hasMany",
-      "model": "CustomerIdentity",
+      "model": "UserIdentity",
       "foreignKey": "userId"
     },
     "credentials": {
       "type": "hasMany",
-      "model": "CustomerCredential",
+      "model": "UserCredential",
       "foreignKey": "userId"
     }
   },

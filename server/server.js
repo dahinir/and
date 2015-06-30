@@ -109,8 +109,8 @@ passportConfigurator.init();
 
 passportConfigurator.setupModels({
 	userModel: app.models.Customer,
-	userIdentityModel: app.models.CustomerIdentity,
-	userCredentialModel: app.models.CustomerCredential
+	userIdentityModel: app.models.UserIdentity,
+	userCredentialModel: app.models.UserCredential
 });
 
 // attempt to build the providers/passport config

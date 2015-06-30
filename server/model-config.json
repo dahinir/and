@@ -23,21 +23,21 @@
     "dataSource": "db",
     "public": true
   },
-
-
-  "Customer": {
-    "dataSource": "db",
-    "public": true
-  },
   "AccessToken": {
     "dataSource": "db",
     "public": false
   },
-  "CustomerCredential": {
+
+  "UserCredential": {
     "dataSource": "db",
     "public": true
   },
-  "CustomerIdentity": {
+  "UserIdentity": {
+    "dataSource": "db",
+    "public": true
+  },
+
+  "Customer": {
     "dataSource": "db",
     "public": true
   },
