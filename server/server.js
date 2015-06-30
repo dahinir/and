@@ -8,12 +8,10 @@ var path = require('path');
 var started = new Date();
 
 // Passport configurators..
-var loopbackPassport = require('loopback-component-passport');
-var PassportConfigurator = loopbackPassport.PassportConfigurator;
+var PassportConfigurator =require('loopback-component-passport').PassportConfigurator;
 var passportConfigurator = new PassportConfigurator(app);
 
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
-
 
 console.log("======");
 console.log(app.get('env'));
@@ -36,10 +34,11 @@ app.use(loopback.compress());
 // [req.accessToken] will attached by rest-api.js NOT THIS.
 // [req.signedCookies.access_token] will atached
 app.use(loopback.token({
+	// this is defaults
 	// cookies: ['authorization'],
 	// headers: ['authorization', 'X-Access-Token'],
 	// params: ['access_token'],
-	model: app.models.CustomerAccessToken
+	model: app.models.AccessToken
 }));
 
 // -- Add your pre-processing middleware here --
@@ -70,7 +69,7 @@ boot(app, __dirname);
 /*
 * body-parser is a piece of express middleware that
 *   reads a form's input and stores it as a javascript
-*   object accessible through `req.body`
+*   object accessible through [req.body]
 */
 var bodyParser = require('body-parser');
 // to support JSON-encoded bodies
@@ -79,9 +78,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
-
+// console.log("asdf");
+// console.log(app.models.Customer.definition);
+// console.log("----");
+// console.log(app.models.Customer.definition.settings);
+// console.log("----");
+// console.log(app.models.CustomerAccessToken.definition.properties);
 
 // Enable http session
+// Parse Cookie header and populate [req.cookies] with an object keyed by the cookie names. Optionally you may enable signed cookie support by passing a secret string, which assigns [req.secret] so it may be used by other middleware.
 app.use(loopback.cookieParser(app.get('cookieSecret')));
 
 // be sure to use express.session() before passport.session()
@@ -98,6 +103,8 @@ app.use(loopback.session({
 /*
  * passport
  */
+// Serialization and deserialization is only required if passport session is
+// enabled
 passportConfigurator.init();
 
 passportConfigurator.setupModels({

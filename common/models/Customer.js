@@ -2,10 +2,10 @@ module.exports = function(Customer) {
   var app = require('../../server/server');
 
   console.log("[customer.js] init");
-
+/*
   Customer.observe('access', function logQuery(ctx, next) {
-    console.log("ahsdfhawielnca;sasdd=====");
-    console.log(ctx );
+    console.log("[customer.js] Customer.observe");
+    // console.log(ctx );
     // console.log('Accessing %s matching %s', ctx.Model.modelName, ctx.query.where);
     next();
   });
@@ -16,16 +16,16 @@ module.exports = function(Customer) {
       if(Array.isArray(ctx.result)) {
         ctx.result.forEach(function (result) {
           // delete result.password;
-          result.afterRemote = true;
+          // result.afterRemote = true;
         });
       } else {
-          result.afterRemote = true;
+          // result.afterRemote = true;
       }
     }
 
     next();
   });
-
+*/
   // 사용하지 않음. 그냥 테스트
   Customer.externalAccounts = function(userId, callback){
     var credentials = [];

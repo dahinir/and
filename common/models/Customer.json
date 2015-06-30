@@ -10,7 +10,7 @@
   "relations": {
     "accessTokens": {
       "type": "hasMany",
-      "model": "CustomerAccessToken",
+      "model": "AccessToken",
       "foreignKey": "userId"
     },
     "identities": {
@@ -45,5 +45,5 @@
       "property": "externalAccounts"
     }
   ],
-  "methods": []
+  "ttl": 31556926
 }

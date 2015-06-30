@@ -6,10 +6,7 @@
       "./node_modules/loopback-component-passport/lib/models"
     ]
   },
-  "AccessToken": {
-    "dataSource": "db",
-    "public": false
-  },
+
   "ACL": {
     "dataSource": "db",
     "public": false
@@ -27,7 +24,12 @@
     "public": true
   },
 
-  "CustomerAccessToken": {
+
+  "Customer": {
+    "dataSource": "db",
+    "public": true
+  },
+  "AccessToken": {
     "dataSource": "db",
     "public": false
   },
@@ -40,12 +42,7 @@
     "public": true
   },
 
-
   "Telegram": {
-    "dataSource": "db",
-    "public": true
-  },
-  "Customer": {
     "dataSource": "db",
     "public": true
   },

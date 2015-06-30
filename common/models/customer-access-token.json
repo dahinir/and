@@ -2,20 +2,9 @@
   "name": "CustomerAccessToken",
   "base": "AccessToken",
   "properties": {
-    "ttl": {
-      "type": "number",
-      "ttl": true,
-      "default": 2209600,
-      "description": "time to live in seconds (2 weeks by default)"
-    }
   },
   "validations": [],
   "relations": {
-    "customer": {
-      "type": "belongsTo",
-      "model": "Customer",
-      "foreignKey": "userId"
-    }
   },
   "acls": [],
   "methods": []
