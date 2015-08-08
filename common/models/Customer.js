@@ -28,6 +28,9 @@ module.exports = function(Customer) {
 */
   // 사용하지 않음. 그냥 테스트
   Customer.externalAccounts = function(userId, callback){
+    console.log(userId);
+    return callback(undefined, {"results": "haha"});
+
     var credentials = [];
     console.log("arg:" + userId);
     // console.log(Customer.__get__identities());
@@ -69,7 +72,7 @@ module.exports = function(Customer) {
         http: function(ctx){
           console.log(ctx.req.accessToken.userId);
           // console.log(ctx.req);
-          console.log(app.models.AccessToken.findForRequest(ctx.req));
+          // console.log(app.models.AccessToken.findForRequest(ctx.req));
           console.log("--------------");
           // console.log(Customer);
           return ctx.req.accessToken.userId;

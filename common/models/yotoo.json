@@ -1,5 +1,6 @@
 {
   "name": "Yotoo",
+  "base": "PersistedModel",
   "properties": {
     "provider": {
       "type": "string",
@@ -16,13 +17,36 @@
     "created": "date"
   },
   "relations": {
-    "owner": {
+    "customer": {
       "type": "belongsTo",
       "model": "Customer",
       "foreignKey": "customerId"
     }
   },
   "validations": [],
-  "acls": [],
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "create"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "count"
+    }
+  ],
   "methods": []
 }

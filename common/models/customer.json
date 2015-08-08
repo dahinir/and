@@ -5,6 +5,9 @@
     "favoriteMovie": {
       "type": "string",
       "required": false
+    },
+    "lastLocation":{
+      "type":"GeoPoint"
     }
   },
   "relations": {

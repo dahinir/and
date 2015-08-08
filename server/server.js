@@ -18,14 +18,19 @@ console.log(app.get('env'));
 console.log("------");
 
 
+
+// TODO: Upgrading applications to use phases
+// http://docs.strongloop.com/display/public/LB/Upgrading+applications+to+use+phases
+//
 // Set up the /favicon.ico
 app.use(loopback.favicon());
 
 // request pre-processing middleware
 app.use(loopback.compress());
 
+// Create a LoopBack context for all requests
 // http://docs.strongloop.com/display/public/LB/Using+current+context
-// app.use(loopback.context());
+app.use(loopback.context());
 
 // The access token is only available after boot
 // but in 'http://docs.strongloop.com/display/public/LB/Making+authenticated+requests'
@@ -45,27 +50,6 @@ app.use(loopback.token({
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
-// just for test
-var reqCallCount = 0;
-app.get('*', function(req, res, next){
-	console.log("===================="+ ++reqCallCount +": "+ req.hostname + req.path);
-	console.log("[server.js] req.headers ---" );
-	console.log(req.headers);
-
-	console.log("[server.js] req.signedCookies ---");
-	console.log(req.signedCookies);
-
-	next();
-});
-
-
-/*
- * Time To Boot Scripts!
- */
-// boot scripts mount components like REST API
-boot(app, __dirname);
-
-
 /*
 * body-parser is a piece of express middleware that
 *   reads a form's input and stores it as a javascript
@@ -78,6 +62,40 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
+
+// just for test
+var reqCallCount = 0;
+app.all('*', function(req, res, next){
+	console.log("===================="+ ++reqCallCount +": "+ req.hostname + req.path);
+	console.log("[server.js] req.headers ---" );
+	console.log(req.headers);
+
+	console.log("[server.js] req.signedCookies ---");
+	console.log(req.signedCookies);
+
+	console.log("[server.js] req.accessToken ---");
+	console.log(req.accessToken);
+
+	console.log("[server.js] req.body");
+	console.log(req.body);
+
+	next();
+}, function(req, res, next){
+	console.log("wow");
+	next();
+},function (req, res, next) {
+	console.log("hhow");
+	next();
+});
+
+
+// Bootstrap the application, configure models, datasources and middleware.
+// Sub-apps like REST API are mounted via boot scripts.
+boot(app, __dirname);
+
+
+
+
 // console.log("asdf");
 // console.log(app.models.Customer.definition);
 // console.log("----");
@@ -100,19 +118,15 @@ app.use(loopback.session({
 }));
 
 
-/*
- * passport
- */
+// passportjs attach `req.user` contains the authenticated user
 // Serialization and deserialization is only required if passport session is
 // enabled
 passportConfigurator.init();
-
 passportConfigurator.setupModels({
 	userModel: app.models.Customer,
 	userIdentityModel: app.models.UserIdentity,
 	userCredentialModel: app.models.UserCredential
 });
-
 // attempt to build the providers/passport config
 var passportConfig = {};
 try {
@@ -121,7 +135,6 @@ try {
   console.trace(err);
   process.exit(1); // fatal
 }
-
 for (var s in passportConfig) {
 	var c = passportConfig[s];
 	c.session = c.session !== false;
@@ -195,7 +208,7 @@ try {
  *
  * (remove this to handle `/` on your own)
  */
-app.get('*', function(req, res, next){
+app.all('*', function(req, res, next){
 	console.log("[server.js] req.session ---");
 	console.log(req.session);
 

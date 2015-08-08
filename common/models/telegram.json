@@ -1,5 +1,6 @@
 {
   "name": "Telegram",
+  "base": "PersistedModel",
   "properties": {
     "criteria": {
       "type": "Object",
