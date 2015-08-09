@@ -14,7 +14,11 @@
       "type":"string",
       "required": true
     },
-    "created": "date"
+    "created": "date",
+    "hided": "boolean",
+	  "unyotooed": "boolean",
+    "completed": "boolean",
+    "burned": "boolean"
   },
   "relations": {
     "customer": {
