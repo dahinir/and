@@ -61,27 +61,31 @@ module.exports = function(Yotoo) {
 
     Yotoo.getApp(function(err, app){
       app.models.UserIdentity.find({where: {userId: accessToken.userId}}, function(err, userIdentities){
-        // console.log("---userIdentities-----");
-        // console.log(userIdentities);
+        console.log("---userIdentities-----");
+        console.log(userIdentities);
+        console.log(accessToken.userId);
         var userIdentity;
         while( userIdentity = userIdentities.pop()){
           // console.log(userIdentity);
           if((userIdentity.externalId == requestBody.senderId)
             && (userIdentity.profile.provider == requestBody.provider)){
-              // console.log("yotoo success!!");
 
-              Yotoo.destroyAll({
+              Yotoo.findOne({where:{
                   provider: requestBody.provider,
                   senderId: requestBody.senderId,
                   receiverId: requestBody.receiverId
-                }, function(err, info){
-                // console.log("err:" +err);
-                // console.log(info);
-                // console.log("count:"+info.count);
-                requestBody.customerId = accessToken.userId;
-                requestBody.created = new Date();
-                // success!
-                next();
+                }}, function(err, yt){
+                // console.log("err: " + JSON.stringify(err));
+                // console.log("yt: "+ JSON.stringify(yt));
+                if(yt){
+                  // error if yotoo is exist
+                  next(new Error("already exist yotoo"));
+                }else{
+                  // success!
+                  requestBody.customerId = accessToken.userId;
+                  requestBody.created = new Date();
+                  next();
+                }
               });
               return;
           }
