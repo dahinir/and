@@ -24,7 +24,7 @@
     "customer": {
       "type": "belongsTo",
       "model": "Customer",
-      "foreignKey": "customerId"
+      "foreignKey": "userId"
     }
   },
   "validations": [],
@@ -37,7 +37,14 @@
     {
       "principalType": "ROLE",
       "principalId": "$owner",
-      "permission": "ALLOW"
+      "permission": "ALLOW",
+      "property": "findById"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "find"
     },
     {
       "principalType": "ROLE",

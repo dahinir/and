@@ -76,7 +76,7 @@ app.all('*', function(req, res, next){
 	console.log("[server.js] req.accessToken ---");
 	console.log(req.accessToken);
 
-	console.log("[server.js] req.body");
+	console.log("[server.js] req.body ---");
 	console.log(req.body);
 
 	next();
@@ -84,7 +84,7 @@ app.all('*', function(req, res, next){
 	console.log("wow");
 	next();
 },function (req, res, next) {
-	console.log("hhow");
+	console.log("wow2");
 	next();
 });
 

@@ -43,6 +43,28 @@ module.exports = function(Yotoo) {
     next();
   });
 */
+  Yotoo.beforeRemote("find", function(ctx, modelInstance, next){
+    console.log("[yotoo.js] beforeRemote find");
+    if(!ctx.req.accessToken.userId || !ctx.req.remotingContext.args){
+      next(new Error("what r u doin?"));
+      return;
+    }
+    var filter = ctx.req.remotingContext.args.filter?
+          JSON.parse(ctx.req.remotingContext.args.filter):
+          {"where":{}};
+    filter.where.userId = ctx.req.accessToken.userId;
+    ctx.req.remotingContext.args.filter = filter;
+    next();
+    return;
+  });
+
+  Yotoo.observe('before save', function (ctx, next) {
+    console.log("[yotoo.js] before save");
+    // console.log(ctx.instance);
+    // console.log("---ctx.data---");
+    // console.log(ctx.data);
+    next();
+  });
   Yotoo.beforeRemote('create', function(ctx, modelInstance, next){
     console.log("[yotoo.js] beforeRemote create");
     // console.log(ctx);
@@ -62,8 +84,8 @@ module.exports = function(Yotoo) {
     Yotoo.getApp(function(err, app){
       app.models.UserIdentity.find({where: {userId: accessToken.userId}}, function(err, userIdentities){
         console.log("---userIdentities-----");
-        console.log(userIdentities);
-        console.log(accessToken.userId);
+        // console.log(userIdentities);
+        // console.log(accessToken.userId);
         var userIdentity;
         while( userIdentity = userIdentities.pop()){
           // console.log(userIdentity);
@@ -82,7 +104,7 @@ module.exports = function(Yotoo) {
                   next(new Error("already exist yotoo"));
                 }else{
                   // success!
-                  requestBody.customerId = accessToken.userId;
+                  requestBody.userId = accessToken.userId;
                   requestBody.created = new Date();
                   next();
                 }
@@ -99,4 +121,18 @@ module.exports = function(Yotoo) {
   // Yotoo.create = function(){
   //   console.log("ahsdfoaiwuhe");
   // };
+  Yotoo.withdraw = function(id, amount, cb) {
+    console.log("withdraw!");
+    console.log(id);
+    console.log("withdraw!");
+    cb(null, true);
+  };
+  Yotoo.remoteMethod('withdraw', {
+    accepts: [
+      {arg: 'id', type: 'string'},
+      {arg: 'amount', type: 'number'},
+    ],
+    returns: {arg: 'success', type: 'boolean'},
+    http: {path:'/withdraw', verb: 'post'}
+  });
 };
