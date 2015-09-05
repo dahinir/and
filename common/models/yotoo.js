@@ -82,41 +82,40 @@ module.exports = function(Yotoo) {
     }
 
     Yotoo.getApp(function(err, app){
-      app.models.UserIdentity.find({where: {userId: accessToken.userId}}, function(err, userIdentities){
+      app.models.UserIdentity.findOne({where: {
+        userId: accessToken.userId,
+        externalId: requestBody.senderId,
+        "profile.provider": requestBody.provider
+      }}, function(err, userIdentity){
         console.log("---userIdentities-----");
-        // console.log(userIdentities);
+        // console.log(userIdentity);
+        // console.log(err);
         // console.log(accessToken.userId);
-        var userIdentity;
-        while( userIdentity = userIdentities.pop()){
-          // console.log(userIdentity);
-          if((userIdentity.externalId == requestBody.senderId)
-            && (userIdentity.profile.provider == requestBody.provider)){
-
-              Yotoo.findOne({where:{
-                  provider: requestBody.provider,
-                  senderId: requestBody.senderId,
-                  receiverId: requestBody.receiverId
-                }}, function(err, yt){
-                // console.log("err: " + JSON.stringify(err));
-                // console.log("yt: "+ JSON.stringify(yt));
-                if(yt){
-                  // error if yotoo is exist
-                  next(new Error("already exist yotoo"));
-                }else{
-                  // success!
-                  requestBody.userId = accessToken.userId;
-                  requestBody.created = new Date();
-                  next();
-                }
-              });
-              return;
-          }
+        if(!userIdentity){
+          next(new Error("what are you doing?"));
+          return;
         }
-        next(new Error("what are you doing?"));
-        return;
+
+        Yotoo.findOne({where:{
+            provider: requestBody.provider,
+            senderId: requestBody.senderId,
+            receiverId: requestBody.receiverId
+          }}, function(err, yt){
+          // console.log("err: " + JSON.stringify(err));
+          // console.log("yt: "+ JSON.stringify(yt));
+          if(yt){
+            // error if yotoo is exist
+            next(new Error("already exist yotoo"));
+          }else{
+            // success!
+            requestBody.userId = accessToken.userId;
+            requestBody.created = new Date();
+            next();
+          }
+          return;
+        });
       });
     });
-
   });
   // Yotoo.create = function(){
   //   console.log("ahsdfoaiwuhe");
