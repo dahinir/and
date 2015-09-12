@@ -81,10 +81,10 @@ app.all('*', function(req, res, next){
 
 	next();
 }, function(req, res, next){
-	console.log("wow");
+	console.log("[server.js] wow");
 	next();
 },function (req, res, next) {
-	console.log("wow2");
+	console.log("[server.js] wow2");
 	next();
 });
 

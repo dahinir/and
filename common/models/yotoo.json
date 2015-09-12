@@ -15,6 +15,7 @@
       "required": true
     },
     "created": "date",
+    "modified": "date",
     "hided": "boolean",
 	  "unyotooed": "boolean",
     "completed": "boolean",
@@ -52,6 +53,13 @@
       "permission": "ALLOW",
       "property": "create"
     },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "updateAttributes"
+    },
+
     {
       "principalType": "ROLE",
       "principalId": "$everyone",
