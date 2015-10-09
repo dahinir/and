@@ -241,6 +241,97 @@ app.get('/auth/accessToken', function(req, res){
 });
 
 
+/* noti start */
+var Notification = app.models.Notification;
+var Application = app.models.Application;
+var PushModel = app.models.Push;
+
+function startPushServer() {
+// Add our custom routes
+  var badge = 1;
+  app.post('/notify/:id', function (req, res, next) {
+    var note = new Notification({
+      // expirationInterval: 3600, // Expires 1 hour from now.
+      badge: badge++,
+      sound: 'ping.aiff',
+      // alert: '\uD83D\uDCE7 \u2709 ' + 'Hello',
+      alert: "t:"+ Date.now()
+      // messageFrom: 'Ray'
+    });
+
+    PushModel.notifyById(req.params.id, note, function (err) {
+      if (err) {
+        console.error('Cannot notify %j: %s', req.params.id, err.stack);
+        next(err);
+        return;
+      }
+      console.log('.....pushing notification to %j', req.params.id);
+      res.send(200, 'OK');
+    });
+  });
+
+  PushModel.on('error', function (err) {
+    console.error('Push Notification error: ', err.stack);
+  });
+
+// Pre-register an application that is ready to be used for testing.
+// You should tweak config options in ./config.js
+  var yotooApp = require("../yotoo-app");
+
+  updateOrCreateApp(function (err, appModel) {
+    if (err) throw err;
+    console.log('Application id: %j', appModel.id);
+  });
+
+//--- Helper functions ---
+  function updateOrCreateApp(cb) {
+    Application.findOne({
+        where: { name: yotooApp.name }
+      },
+      function (err, result) {
+        if (err) cb(err);
+        if (result) {
+          console.log('Updating application: ' + result.id);
+          // console.log(result.pushSettings.apns.certData);
+          // console.log('yotooApp:'+ JSON.stringify(yotooApp));
+          result.updateAttributes(yotooApp, cb);
+          // console.log('yotooApp:'+ JSON.stringify(result));
+        } else {
+					console.log("[] already?");
+          return registerApp(cb);
+        }
+      });
+  }
+  function registerApp(cb) {
+    console.log('Registering a new Application...');
+    // Hack to set the app id to a fixed value so that we don't have to change
+    // the client settings
+    Application.beforeSave = function (next) {
+      if(this.name === yotooApp.name) {
+        this.id = 'com.dasolute.yotoo';
+      }
+      next();
+    };
+    Application.register(
+      yotooApp.userId,  // 'put your developer id here',
+      yotooApp.name, //'put your unique application name here',
+      {
+        description: yotooApp.description,
+        pushSettings: yotooApp.pushSettings
+      },
+      function (err, app) {
+        if (err){
+          console.log(" register app error");
+          return cb(err);
+        }
+        console.log(" register app success");
+        return cb(null, app);
+      }
+    );
+  }
+}
+startPushServer();
+/* noti end */
 
 
 // Let express routes handle requests that were not handled
@@ -320,125 +411,6 @@ app.start = function() {
 		// console.log(app.models);
   });
 };
-
-
-/* noti start */
-var Notification = app.models.notification;
-var Application = app.models.application;
-var PushModel = app.models.push;
-
-function startPushServer() {
-// Add our custom routes
-  var badge = 1;
-  app.post('/notify/:id', function (req, res, next) {
-    var note = new Notification({
-      // expirationInterval: 3600, // Expires 1 hour from now.
-      badge: badge++,
-      sound: 'ping.aiff',
-      // alert: '\uD83D\uDCE7 \u2709 ' + 'Hello',
-      alert: "t:"+ Date.now()
-      // messageFrom: 'Ray'
-    });
-
-    PushModel.notifyById(req.params.id, note, function (err) {
-      if (err) {
-        console.error('Cannot notify %j: %s', req.params.id, err.stack);
-        next(err);
-        return;
-      }
-      console.log('.....pushing notification to %j', req.params.id);
-      res.send(200, 'OK');
-    });
-  });
-
-  PushModel.on('error', function (err) {
-    console.error('Push Notification error: ', err.stack);
-  });
-
-// Pre-register an application that is ready to be used for testing.
-// You should tweak config options in ./config.js
-  var config = require('./config');
-  var demoApp = {
-    id: 'com.dasolute.yotoo',
-    userId: 'dahini@dasolute.com',
-    name: config.appName,
-
-    description: 'LoopBack Push Notification Demo Application',
-    pushSettings: {
-      apns: {
-        certData: config.apnsCertData,
-        keyData: config.apnsKeyData,
-        // key: 'cre/key.pem',
-        // cert: 'cre/cert.pem',
-        production: false,
-        pushOptions: {
-          port: 2195  //
-          // Extra options can go here for APN
-        },
-        feedbackOptions: {
-          batchFeedback: true,
-          interval: 300
-        }
-      },
-      gcm: {
-        serverApiKey: config.gcmServerApiKey
-      }
-    }
-  };
-
-  updateOrCreateApp(function (err, appModel) {
-    if (err) throw err;
-    console.log('Application id: %j', appModel.id);
-  });
-
-//--- Helper functions ---
-  function updateOrCreateApp(cb) {
-    Application.findOne({
-        where: { name: demoApp.name }
-      },
-      function (err, result) {
-        if (err) cb(err);
-        if (result) {
-          console.log('Updating application: ' + result.id);
-          // console.log(result.pushSettings.apns.certData);
-          // console.log('demoApp:'+ JSON.stringify(demoApp));
-          // result.updateAttributes(demoApp, cb);
-          // console.log('demoApp:'+ JSON.stringify(result));
-        } else {
-          return registerApp(cb);
-        }
-      });
-  }
-  function registerApp(cb) {
-    console.log('Registering a new Application...');
-    // Hack to set the app id to a fixed value so that we don't have to change
-    // the client settings
-    Application.beforeSave = function (next) {
-      if(this.name === demoApp.name) {
-        this.id = 'com.dasolute.yotoo';
-      }
-      next();
-    };
-    Application.register(
-      demoApp.userId,  // 'put your developer id here',
-      demoApp.name, //'put your unique application name here',
-      {
-        description: demoApp.description,
-        pushSettings: demoApp.pushSettings
-      },
-      function (err, app) {
-        if (err){
-          console.log(" register app error");
-          return cb(err);
-        }
-        console.log(" register app success");
-        return cb(null, app);
-      }
-    );
-  }
-}
-// startPushServer();
-/* noti end */
 
 if(require.main === module) {
   app.start();

@@ -16,6 +16,7 @@
     "express-session": "^1.7.6",
     "connect-ensure-login": "^0.1.1",
     "loopback-component-passport": "^1.0.5",
+    "loopback-component-push": "1.5.1",
     "passport": "^0.2.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.1.2",
@@ -31,8 +32,7 @@
     "compare-version": "latest"
   },
   "optionalDependencies": {
-    "loopback-explorer": "latest",
-    "loopback-push-notification": "latest"
+    "loopback-explorer": "latest"
   },
   "devDependencies": {
     "jshint": "^2.5.6",
@@ -61,7 +61,6 @@
     "loopback-connector-rest",
     "loopback-datasource-juggler",
     "loopback-explorer",
-    "loopback-push-notification",
     "passport",
     "passport-local",
     "passport-oauth2",

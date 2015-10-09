@@ -19,13 +19,26 @@
     "dataSource": "db",
     "public": false
   },
-  "Application": {
-    "dataSource": "db",
-    "public": true
-  },
   "AccessToken": {
     "dataSource": "db",
     "public": false
+  },
+
+  "Application": {
+    "public": true,
+    "dataSource": "db"
+  },
+  "Installation": {
+    "public": true,
+    "dataSource": "db"
+  },
+  "Notification": {
+    "public": true,
+    "dataSource": "db"
+  },
+  "Push": {
+    "public": true,
+    "dataSource": "push"
   },
 
   "UserCredential": {

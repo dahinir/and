@@ -9,11 +9,11 @@
     "database": "and_local"
   },
   "push": {
-    "defaultForType": "push",
-    "connector": "loopback-push-notification",
-    "installation": "installation",
-    "notification": "notification",
-    "application": "application"
+    "name": "push",
+    "connector": "loopback-component-push",
+    "installation": "Installation",
+    "notification": "Notification",
+    "application": "Application"
   },
   "mail": {
     "defaultForType": "mail",
