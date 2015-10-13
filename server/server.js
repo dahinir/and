@@ -242,11 +242,12 @@ app.get('/auth/accessToken', function(req, res){
 
 
 /* noti start */
-var Notification = app.models.Notification;
+// var Notification = app.models.Notification;
 var Application = app.models.Application;
-var PushModel = app.models.Push;
+// var PushModel = app.models.Push;
 
 function startPushServer() {
+	/*
 // Add our custom routes
   var badge = 1;
   app.post('/notify/:id', function (req, res, next) {
@@ -265,6 +266,9 @@ function startPushServer() {
         next(err);
         return;
       }
+			note.save(undefined, function(err){
+				console.log(("save note!"));
+			});
       console.log('.....pushing notification to %j', req.params.id);
       res.send(200, 'OK');
     });
@@ -273,6 +277,7 @@ function startPushServer() {
   PushModel.on('error', function (err) {
     console.error('Push Notification error: ', err.stack);
   });
+*/
 
 // Pre-register an application that is ready to be used for testing.
 // You should tweak config options in ./config.js
