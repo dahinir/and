@@ -88,10 +88,45 @@ app.all('*', function(req, res, next){
 	next();
 });
 
+app.start = function() {
+	console.log("app.start ");
+	// start the web server
+  return app.listen(function() {
+    var baseUrl = 'http://' + app.get('host') + ':' + app.get('port');
+    app.emit('started', baseUrl);
+    console.log('LoopBack server listening @ %s%s', baseUrl, '/');
+		if (app.get('loopback-component-explorer')) {
+      var explorerPath = app.get('loopback-component-explorer').mountPath;
+      console.log('Browse your REST API at %s%s', baseUrl, explorerPath);
+    }
+    // app.models.application.findById("com.dasolute.yotoo", function(err, instance){
+    //   console.log(JSON.stringify(instance));
+    // });
+    // app.models.applicationVersion.findById("536e56bd7482750000c4bc54", function(err, instance){
+    //   console.log(JSON.stringify(instance));
+    //   console.log(JSON.stringify(instance.application()));
+    //
+    //   instance.application(function(err,app){
+    //     console.log(JSON.stringify(app));
+    //   });
+    // });
+		// app.models.Customer.hasMany('chapters', {model: app.models.CustomerIdentity});
+		// app.models.Customer.hasMany(app.models.AccessToken, {as: 'identy', foreignKey: 'userId'});
+
+		// console.log(app.models);
+  });
+};
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
-boot(app, __dirname);
+boot(app, __dirname, function(err){
+	if (err) throw err;
+
+	// start the server if `$ node server.js`
+	if(require.main === module) {
+	  app.start();
+	}
+});
 
 
 
@@ -117,7 +152,7 @@ app.use(loopback.session({
 	resave: true
 }));
 
-
+/*
 // passportjs attach `req.user` contains the authenticated user
 // Serialization and deserialization is only required if passport session is
 // enabled
@@ -141,7 +176,7 @@ for (var s in passportConfig) {
 	// console.log("sex:"+ c.session);
 	passportConfigurator.configureProvider(s, c);
 }
-
+*/
 
 
 /*
@@ -335,7 +370,7 @@ function startPushServer() {
     );
   }
 }
-startPushServer();
+// startPushServer();
 /* noti end */
 
 
@@ -392,31 +427,3 @@ app.use(loopback.errorHandler());
  *
  * (only if this module is the main module)
  */
-
-app.start = function() {
-	console.log("app.start ");
-  return app.listen(function() {
-    var baseUrl = 'http://' + app.get('host') + ':' + app.get('port');
-    app.emit('started', baseUrl);
-    console.log('LoopBack server listening @ %s%s', baseUrl, '/');
-    // app.models.application.findById("com.dasolute.yotoo", function(err, instance){
-    //   console.log(JSON.stringify(instance));
-    // });
-    // app.models.applicationVersion.findById("536e56bd7482750000c4bc54", function(err, instance){
-    //   console.log(JSON.stringify(instance));
-    //   console.log(JSON.stringify(instance.application()));
-    //
-    //   instance.application(function(err,app){
-    //     console.log(JSON.stringify(app));
-    //   });
-    // });
-		// app.models.Customer.hasMany('chapters', {model: app.models.CustomerIdentity});
-		// app.models.Customer.hasMany(app.models.AccessToken, {as: 'identy', foreignKey: 'userId'});
-
-		// console.log(app.models);
-  });
-};
-
-if(require.main === module) {
-  app.start();
-}
