@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "sources": [
+      "../common/models",
+      "./models",
+      "./node_modules/loopback-component-passport/lib/models"
+    ]
+  },
+
+  "ACL": {
+    "dataSource": "db",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "db",
+    "public": false
+  },
+  "Role": {
+    "dataSource": "db",
+    "public": false
+  },
+  "AccessToken": {
+    "dataSource": "db",
+    "public": false
+  },
+
+  "Application": {
+    "public": true,
+    "dataSource": "db"
+  },
+  "Installation": {
+    "public": true,
+    "dataSource": "db"
+  },
+  "Notification": {
+    "public": true,
+    "dataSource": "db"
+  },
+  "Push": {
+    "public": true,
+    "dataSource": "push"
+  },
+
+  "UserCredential": {
+    "dataSource": "db",
+    "public": true
+  },
+  "UserIdentity": {
+    "dataSource": "db",
+    "public": true
+  },
+
+  "Customer": {
+    "dataSource": "db",
+    "public": true
+  },
+
+  "Telegram": {
+    "dataSource": "db",
+    "public": true
+  },
+  "Yotoo": {
+    "dataSource": "db",
+    "public": true
+  }
+}

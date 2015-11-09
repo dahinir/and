@@ -1,20 +1,70 @@
 {
+  "name": "and",
   "version": "0.0.1",
-  "main": "app.js",
-  "bin": "server.js",
+  "main": "server/server.js",
   "scripts": {
-    "start": "node app.js"
+    "pretest": "jshint .",
+    "test": "mocha -R spec server/test"
   },
   "dependencies": {
-    "loopback": "latest",
+    "compression": "^1.0.3",
+    "cors": "^2.5.2",
+    "errorhandler": "^1.1.1",
+    "loopback": "2.22.2",
+    "loopback-boot": "^2.6.5",
+    "body-parser": "^1.9.0",
+    "cookie-parser": "^1.3.2",
+    "express-session": "^1.7.6",
+    "connect-ensure-login": "^0.1.1",
+    "loopback-component-explorer": "^2.1.0",
+    "loopback-component-passport": "^1.0.5",
+    "loopback-component-push": "1.5.1",
+    "passport": "^0.2.0",
+    "passport-local": "^1.0.0",
+    "passport-oauth2": "^1.1.2",
+    "passport-twitter": "~1.0.2",
+    "loopback-datasource-juggler": "^2.39.0",
     "loopback-connector-mongodb": "latest",
+    "serve-favicon": "^2.0.1",
+    "function-rate-limit": "~0.0.1",
+    "async": "~0.9.0",
+    "loopback-connector-rest": "^1.1.4",
     "underscore": "latest",
     "fbgraph": "latest",
     "compare-version": "latest"
   },
-  "optionalDependencies": {
-    "loopback-explorer": "latest",
-    "loopback-push-notification": "latest"
+  "devDependencies": {
+    "jshint": "^2.5.6",
+    "mocha": "^1.20.1",
+    "supertest": "^0.13.0"
   },
-  "name": "and"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dahinir/and.git"
+  },
+  "bundleDependencies": [
+    "async",
+    "body-parser",
+    "compare-version",
+    "compression",
+    "connect-ensure-login",
+    "cookie-parser",
+    "errorhandler",
+    "express-session",
+    "fbgraph",
+    "function-rate-limit",
+    "loopback",
+    "loopback-boot",
+    "loopback-component-passport",
+    "loopback-connector-mongodb",
+    "loopback-connector-rest",
+    "loopback-datasource-juggler",
+    "loopback-explorer",
+    "passport",
+    "passport-local",
+    "passport-oauth2",
+    "passport-twitter",
+    "serve-favicon",
+    "underscore"
+  ]
 }
