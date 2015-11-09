@@ -1,5 +1,5 @@
 {
-  "name": "Yotoo",
+  "name": "Yo",
   "base": "PersistedModel",
   "properties": {
     "provider": {
@@ -16,10 +16,10 @@
     },
     "created": "date",
     "modified": "date",
-    "hided": "boolean",
-	  "unyotooed": "boolean",
-    "completed": "boolean",
-    "burned": "boolean"
+    "hide": "boolean",
+	  "unyo": "boolean",
+    "complete": "boolean",
+    "burn": "boolean"
   },
   "relations": {
     "customer": {

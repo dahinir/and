@@ -1,7 +1,7 @@
 var loopback  = require('loopback');
 // var request = require("request");
-module.exports = function(Yotoo) {
-  // Yotoo.validate('name', customValidator, {message: 'Bad name'});
+module.exports = function(Yo) {
+  // Yo.validate('name', customValidator, {message: 'Bad name'});
   // function customValidator(err) {
   //   console.log("=====validate--====");
   //   console.log(arguments);
@@ -11,20 +11,20 @@ module.exports = function(Yotoo) {
     // var context = loopback.getCurrentContext();
     // console.log(context.active.accessToken);
 
-    // Yotoo.getApp(function(err, app){
+    // Yo.getApp(function(err, app){
       // app.models.UserIdentity.find
     // });
 
     // err();
     //   if (this.name === 'bad') err();
   // };
-  // Yotoo.validate("duplicated",);
+  // Yo.validate("duplicated",);
 
 
 /*
   // The before save hook is triggered before a model instance is about to be modified (created, updated). The hook is triggered before the validation.
-  Yotoo.observe('before save', function (ctx, next) {
-    console.log("[yotoo.js] before save");
+  Yo.observe('before save', function (ctx, next) {
+    console.log("[yo.js] before save");
     delete ctx.Model;
     console.log(ctx);
     console.log("context");
@@ -43,8 +43,8 @@ module.exports = function(Yotoo) {
     next();
   });
 */
-  Yotoo.beforeRemote("find", function(ctx, modelInstance, next){
-    console.log("[yotoo.js] beforeRemote find");
+  Yo.beforeRemote("find", function(ctx, modelInstance, next){
+    console.log("[yo.js] beforeRemote find");
     if(!ctx.req.accessToken.userId || !ctx.req.remotingContext.args){
       next(new Error("what r u doin?"));
       return;
@@ -58,15 +58,15 @@ module.exports = function(Yotoo) {
     return;
   });
 
-  Yotoo.observe('before save', function (ctx, next) {
-    console.log("[yotoo.js] before save");
+  Yo.observe('before save', function (ctx, next) {
+    console.log("[yo.js] before save");
     // console.log(ctx.instance);
     // console.log("---ctx.data---");
     // console.log(ctx.data);
     next();
   });
-  Yotoo.beforeRemote('create', function(ctx, modelInstance, next){
-    console.log("[yotoo.js] beforeRemote create");
+  Yo.beforeRemote('create', function(ctx, modelInstance, next){
+    console.log("[yo.js] beforeRemote create");
     // console.log(ctx);
     // console.log("modelInstance");
     // console.log(modelInstance);
@@ -81,7 +81,7 @@ module.exports = function(Yotoo) {
       return;
     }
 
-    Yotoo.getApp(function(err, app){
+    Yo.getApp(function(err, app){
       app.models.UserIdentity.findOne({where: {
         userId: accessToken.userId,
         externalId: requestBody.senderId,
@@ -96,16 +96,16 @@ module.exports = function(Yotoo) {
           return;
         }
 
-        Yotoo.findOne({where:{
+        Yo.findOne({where:{
             provider: requestBody.provider,
             senderId: requestBody.senderId,
             receiverId: requestBody.receiverId
-          }}, function(err, yt){
+          }}, function(err, yo){
           // console.log("err: " + JSON.stringify(err));
           // console.log("yt: "+ JSON.stringify(yt));
-          if(yt){
-            // error if yotoo is exist
-            next(new Error("already exist yotoo"));
+          if(yo){
+            // error if yo is exist
+            next(new Error("already exist yo"));
           }else{
             // success!
             requestBody.userId = accessToken.userId;
@@ -117,16 +117,16 @@ module.exports = function(Yotoo) {
       });
     });
   });
-  // Yotoo.create = function(){
+  // Yo.create = function(){
   //   console.log("ahsdfoaiwuhe");
   // };
-  Yotoo.withdraw = function(id, amount, cb) {
+  Yo.withdraw = function(id, amount, cb) {
     console.log("withdraw!");
     console.log(id);
     console.log("withdraw!");
     cb(null, true);
   };
-  Yotoo.remoteMethod('withdraw', {
+  Yo.remoteMethod('withdraw', {
     accepts: [
       {arg: 'id', type: 'string'},
       {arg: 'amount', type: 'number'},
