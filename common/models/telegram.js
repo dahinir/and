@@ -22,7 +22,7 @@ module.exports = function(Telegram) {
   // });
 
   Telegram.mine = function(criteria, callback){
-    console.log("TELEGRAM   dd");
+    console.log("TELEGRAM.mine called");
     if ( typeof criteria === 'function'){
       callback = criteria;
       criteria = undefined;
