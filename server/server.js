@@ -67,6 +67,7 @@ app.use(bodyParser.urlencoded({
 var reqCallCount = 0;
 app.all('*', function(req, res, next){
 	console.log("===================="+ ++reqCallCount +": "+ req.hostname + req.path);
+	console.log(req.method);
 	console.log("[server.js] req.headers ---" );
 	console.log(req.headers);
 
