@@ -19,6 +19,16 @@ module.exports = function(Yo) {
     return;
   });
 
+  Yo.beforeRemote("findById", function(ctx, modelInstance, next){
+    console.log("[yo.js] beforeRemote findById");
+    next();
+  });
+  // should work "destroyById" but aliases not working
+  Yo.beforeRemote("deleteById", function(ctx, modelInstance, next){
+    console.log("[yo.js] beforeRemote deleteById");
+    next();
+  });
+
   Yo.observe('before save', function (ctx, next) {
     console.log("[yo.js] before save");
     console.log(ctx.instance);
