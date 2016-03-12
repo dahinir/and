@@ -131,14 +131,6 @@ boot(app, __dirname, function(err){
 
 
 
-
-// console.log("asdf");
-// console.log(app.models.Customer.definition);
-// console.log("----");
-// console.log(app.models.Customer.definition.settings);
-// console.log("----");
-// console.log(app.models.CustomerAccessToken.definition.properties);
-
 // Enable http session
 // Parse Cookie header and populate [req.cookies] with an object keyed by the cookie names. Optionally you may enable signed cookie support by passing a secret string, which assigns [req.secret] so it may be used by other middleware.
 app.use(loopback.cookieParser(app.get('cookieSecret')));
@@ -245,6 +237,7 @@ try {
  * (remove this to handle `/` on your own)
  */
 app.all('*', function(req, res, next){
+	console.log("-----after boot------");
 	console.log("[server.js] req.session ---");
 	console.log(req.session);
 
@@ -283,38 +276,6 @@ var Application = app.models.Application;
 // var PushModel = app.models.Push;
 
 function startPushServer() {
-	/*
-// Add our custom routes
-  var badge = 1;
-  app.post('/notify/:id', function (req, res, next) {
-    var note = new Notification({
-      // expirationInterval: 3600, // Expires 1 hour from now.
-      badge: badge++,
-      sound: 'ping.aiff',
-      // alert: '\uD83D\uDCE7 \u2709 ' + 'Hello',
-      alert: "t:"+ Date.now()
-      // messageFrom: 'Ray'
-    });
-
-    PushModel.notifyById(req.params.id, note, function (err) {
-      if (err) {
-        console.error('Cannot notify %j: %s', req.params.id, err.stack);
-        next(err);
-        return;
-      }
-			note.save(undefined, function(err){
-				console.log(("save note!"));
-			});
-      console.log('.....pushing notification to %j', req.params.id);
-      res.send(200, 'OK');
-    });
-  });
-
-  PushModel.on('error', function (err) {
-    console.error('Push Notification error: ', err.stack);
-  });
-*/
-
 // Pre-register an application that is ready to be used for testing.
 // You should tweak config options in ./config.js
   var yotooApp = require("../yotoo-app");

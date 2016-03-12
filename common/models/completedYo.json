@@ -1,5 +1,5 @@
 {
-  "name": "Yo",
+  "name": "CompletedYo",
   "base": "PersistedModel",
   "properties": {
     "provider": {

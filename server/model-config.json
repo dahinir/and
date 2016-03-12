@@ -62,5 +62,9 @@
   "Yo": {
     "dataSource": "db",
     "public": true
+  },
+  "CompletedYo": {
+    "dataSource": "db",
+    "public": false
   }
 }
