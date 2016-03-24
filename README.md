@@ -5,6 +5,9 @@ and for yotoo
 
 $ forever -w server/server.js
 
+* modify for test server
+  * server/config.json : port is 80
+
 * before distribution
   * application model public false( certData!!)
 
