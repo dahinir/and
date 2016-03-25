@@ -158,6 +158,7 @@ var passportConfig = {};
 try {
   passportConfig = require('../credentials/providers.json');
 } catch (err) {
+	console.log("[server.js] there is no credential file: ex)credentials/providers.json");
   console.trace(err);
   process.exit(1); // fatal
 }
