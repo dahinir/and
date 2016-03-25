@@ -13,7 +13,7 @@ var passportConfigurator = new PassportConfigurator(app);
 
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 
-console.log("======");
+console.log("========");
 console.log(app.get('env'));
 console.log("------");
 
