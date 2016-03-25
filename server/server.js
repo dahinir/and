@@ -130,7 +130,6 @@ boot(app, __dirname, function(err){
 });
 
 
-
 // Enable http session
 // Parse Cookie header and populate [req.cookies] with an object keyed by the cookie names. Optionally you may enable signed cookie support by passing a secret string, which assigns [req.secret] so it may be used by other middleware.
 app.use(loopback.cookieParser(app.get('cookieSecret')));
@@ -145,7 +144,6 @@ app.use(loopback.session({
 	resave: true
 }));
 
-/*
 // passportjs attach `req.user` contains the authenticated user
 // Serialization and deserialization is only required if passport session is
 // enabled
@@ -169,8 +167,6 @@ for (var s in passportConfig) {
 	// console.log("sex:"+ c.session);
 	passportConfigurator.configureProvider(s, c);
 }
-*/
-
 
 /*
  * 2. Configure request preprocessing
