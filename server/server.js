@@ -32,19 +32,7 @@ app.use(loopback.compress());
 // http://docs.strongloop.com/display/public/LB/Using+current+context
 app.use(loopback.context());
 
-// The access token is only available after boot
-// but in 'http://docs.strongloop.com/display/public/LB/Making+authenticated+requests'
-// To use cookies for authentication, add the following to server.js (before boot):
-// http://apidocs.strongloop.com/loopback/#loopback-token
-// [req.accessToken] will attached by rest-api.js NOT THIS.
-// [req.signedCookies.access_token] will atached
-app.use(loopback.token({
-	// this is defaults
-	// cookies: ['authorization'],
-	// headers: ['authorization', 'X-Access-Token'],
-	// params: ['access_token'],
-	model: app.models.AccessToken
-}));
+
 
 // -- Add your pre-processing middleware here --
 app.set('views', __dirname + '/views');
@@ -129,6 +117,19 @@ boot(app, __dirname, function(err){
 	}
 });
 
+// The access token is only available after boot
+// but in 'http://docs.strongloop.com/display/public/LB/Making+authenticated+requests'
+// To use cookies for authentication, add the following to server.js (before boot):
+// http://apidocs.strongloop.com/loopback/#loopback-token
+// [req.accessToken] will attached by rest-api.js NOT THIS.
+// [req.signedCookies.access_token] will atached
+app.use(loopback.token({
+	// this is defaults
+	// cookies: ['authorization'],
+	// headers: ['authorization', 'X-Access-Token'],
+	// params: ['access_token'],
+	model: app.models.AccessToken
+}));
 
 // Enable http session
 // Parse Cookie header and populate [req.cookies] with an object keyed by the cookie names. Optionally you may enable signed cookie support by passing a secret string, which assigns [req.secret] so it may be used by other middleware.
