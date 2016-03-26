@@ -165,7 +165,6 @@ try {
 for (var s in passportConfig) {
 	var c = passportConfig[s];
 	c.session = c.session !== false;
-	// console.log("sex:"+ c.session);
 	passportConfigurator.configureProvider(s, c);
 }
 
