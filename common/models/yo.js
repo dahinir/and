@@ -1,48 +1,9 @@
 var loopback  = require('loopback');
-// var request = require("request");
+
 module.exports = function(Yo) {
-  // Yo.validate('name', customValidator, {message: 'Bad name'});
-  // function customValidator(err) {
-  //   console.log("=====validate--====");
-  //   console.log(arguments);
-  //   console.log("====this===");
-  //   console.log(this);
-    // console.log("---context----");
-    // var context = loopback.getCurrentContext();
-    // console.log(context.active.accessToken);
+  var app = require('../../server/server');
 
-    // Yo.getApp(function(err, app){
-      // app.models.UserIdentity.find
-    // });
-
-    // err();
-    //   if (this.name === 'bad') err();
-  // };
-  // Yo.validate("duplicated",);
-
-
-/*
-  // The before save hook is triggered before a model instance is about to be modified (created, updated). The hook is triggered before the validation.
-  Yo.observe('before save', function (ctx, next) {
-    console.log("[yo.js] before save");
-    delete ctx.Model;
-    console.log(ctx);
-    console.log("context");
-    var context = loopback.getCurrentContext();
-    console.log(context);
-    // Full save of a single model
-    if (ctx.instance) {
-      // console.log(ctx.inst/ance);
-      // ctx.Model.findById(userId, function(err, customer) {}
-      // ctx.instance.percentage = 100 * ctx.instance.part / ctx.instance.total;
-    // Partial update of possibly multiple models
-    } else if (ctx.data) {
-      // console.log(ctx.data)
-      // ctx.data.percentage = 100 * ctx.data.part / ctx.data.total;
-    }
-    next();
-  });
-*/
+  // authentication
   Yo.beforeRemote("find", function(ctx, modelInstance, next){
     console.log("[yo.js] beforeRemote find");
     if(!ctx.req.accessToken.userId || !ctx.req.remotingContext.args){
@@ -58,9 +19,19 @@ module.exports = function(Yo) {
     return;
   });
 
+  Yo.beforeRemote("findById", function(ctx, modelInstance, next){
+    console.log("[yo.js] beforeRemote findById");
+    next();
+  });
+  // should work "destroyById" but aliases not working
+  Yo.beforeRemote("deleteById", function(ctx, modelInstance, next){
+    console.log("[yo.js] beforeRemote deleteById");
+    next();
+  });
+
   Yo.observe('before save', function (ctx, next) {
     console.log("[yo.js] before save");
-    // console.log(ctx.instance);
+    console.log(ctx.instance);
     // console.log("---ctx.data---");
     // console.log(ctx.data);
     next();
@@ -87,51 +58,125 @@ module.exports = function(Yo) {
         externalId: requestBody.senderId,
         "profile.provider": requestBody.provider
       }}, function(err, userIdentity){
-        console.log("---userIdentities-----");
-        // console.log(userIdentity);
         // console.log(err);
-        // console.log(accessToken.userId);
         if(!userIdentity){
           next(new Error("what are you doing?"));
           return;
         }
-
-        Yo.findOne({where:{
+        // find exist Yo
+        Yo.findOne({
+          where:{
             provider: requestBody.provider,
             senderId: requestBody.senderId,
             receiverId: requestBody.receiverId
-          }}, function(err, yo){
-          // console.log("err: " + JSON.stringify(err));
-          // console.log("yt: "+ JSON.stringify(yt));
-          if(yo){
-            // error if yo is exist
-            next(new Error("already exist yo"));
-          }else{
-            // success!
-            requestBody.userId = accessToken.userId;
-            requestBody.created = new Date();
-            next();
-          }
-          return;
-        });
+          }},
+          function(err, yo){
+            if(yo){
+              // error if yo is exist
+              next(new Error("already exist yo"));
+            }else{
+              // success!
+              requestBody.userId = accessToken.userId;
+              requestBody.created = new Date();
+              next();
+            }
+            return;
+          });
       });
     });
+  }); // end of Yo.beforeRemote()
+
+  // NOTHING
+  Yo.observe("after save", function (ctx, next) {
+    console.log("[yo.js] after save");
+    console.log(ctx.instance);
+    console.log(JSON.stringify(ctx.instance));
+    // console.log("---ctx.data---");
+    // console.log(ctx.data);
+
+    if(ctx.instance.unyo){
+      console.log("[yo.js] unyo! " + ctx.instance.unyo);
+    }else{
+      console.log("[yo.js] yo! with unyo: " + ctx.instance.unyo);
+    }
+    next();
   });
-  // Yo.create = function(){
-  //   console.log("ahsdfoaiwuhe");
-  // };
-  Yo.withdraw = function(id, amount, cb) {
-    console.log("withdraw!");
-    console.log(id);
-    console.log("withdraw!");
-    cb(null, true);
-  };
-  Yo.remoteMethod('withdraw', {
-    accepts: [
-      {arg: 'id', type: 'string'},
-      {arg: 'amount', type: 'number'},
-    ],
-    returns: {arg: 'success', type: 'boolean'},
-    http: {path:'/withdraw', verb: 'post'}
+
+  Yo.afterRemote("delete", function(){
+    console.log("[yo.js] afterRemote delete.");
+    // delete VeiledCompleteYo
+    app.models.VeiledCompleteYo.findOne()
   });
+
+  Yo.afterRemote("create", function(ctx, yoInstance, next){
+    console.log("[yo.js] afterRemote create. one!");
+
+    // Persist `CompletedYo` and `VeiledCompleteYo` if this yo is mutual.
+    Yo.findOne({
+      where:{
+        provider: yoInstance.provider,
+        senderId: yoInstance.receiverId,
+        receiverId: yoInstance.senderId
+      }},
+      function(err, yo){
+        if(yo){
+          console.log("[yo.js] there is mutual yo!");
+          var mutualYo = {
+            provider: yoInstance.provider,
+            a: yoInstance.receiverId, // first yo
+            b: yoInstance.senderId
+          };
+          // Persist CompletedYo for history of this service.
+          app.models.CompletedYo.create(mutualYo, function(err, models){
+            console.log("[yo.js] created CompletedYo.");
+          });
+          // Persist VeiledCompleteYo for notify.
+          app.models.VeiledCompleteYo.create(mutualYo, function(err, models){
+            console.log("[yo.js] created VeiledCompleteYo.");
+          });
+        }else{
+          console.log("[yo.js] there is no mutual yo..");
+        }
+    });
+    next();
+    console.log("[yo.js] afterRemote create. one end");
+  });
+
+  Yo.afterRemote("create", function(ctx, yoInstance, next){
+    console.log("[yo.js] afterRemote create. two!");
+
+    // Send notification "somebody got yo!" for every created Yo.
+    app.models.UserIdentity.findOne({where: {
+      externalId: yoInstance.receiverId,
+      "profile.provider": yoInstance.provider
+    }}, function(err, userIdentity){
+      console.log("[yo.js] yeah!");
+      if(userIdentity){ // receiver has account
+        console.log("[yo.js] recevier has a account of this service.");
+        var Notification = app.models.Notification;
+        var Push = app.models.Push;
+        notification = new Notification({
+          alert: userIdentity.profile.username + " gots yo!"  // needs i18n
+          // expirationInterval: 3600, // Expires 1 hour from now.
+          // badge: 23,
+          // sound: 'ping.aiff',
+          // messageFrom: 'Ray'
+        });
+        Push.notifyByQuery({
+          appId: "com.dasolute.yotoo",
+          userId: userIdentity.userId
+        }, notification,
+        function(e){
+          console.log("[yo.js] push notification has sent.");
+        });
+      }else{  // receiver has not account
+        // send some twitter mention to the receiver
+        console.log("[yo.js] recevier has not account of this service.");
+      }
+    });
+
+    next();
+    console.log("[yo.js] afterRemote create. two end");
+  }); // End of Yo.afterRemote("create", function(ctx, yoInstance, next){
+
 };

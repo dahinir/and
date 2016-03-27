@@ -26,7 +26,7 @@ module.exports = function(Customer) {
     next();
   });
 */
-  // 사용하지 않음. 그냥 테스트
+  // just for test
   Customer.externalAccounts = function(userId, callback){
     console.log(userId);
     return callback(undefined, {"results": "haha"});
