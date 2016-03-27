@@ -1,0 +1,71 @@
+{
+  "name": "CompletedYo",
+  "base": "PersistedModel",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "required": true
+    },
+    "senderId": {
+      "type":"string",
+      "required": true
+    },
+    "receiverId": {
+      "type":"string",
+      "required": true
+    },
+    "hide": "boolean",
+    "complete": "boolean",
+    "burn": "boolean",
+
+    "created": "date",
+    "modified": "date"
+  },
+  "relations": {
+    "customer": {
+      "type": "belongsTo",
+      "model": "Customer",
+      "foreignKey": "userId"
+    }
+  },
+  "validations": [],
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "findById"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "find"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "create"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "updateAttributes"
+    },
+
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "count"
+    }
+  ],
+  "methods": []
+}
