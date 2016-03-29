@@ -6,6 +6,7 @@ module.exports = function(Yo) {
   // authentication
   Yo.beforeRemote("find", function(ctx, modelInstance, next){
     console.log("[yo.js] beforeRemote find");
+
     if(!ctx.req.accessToken.userId || !ctx.req.remotingContext.args){
       next(new Error("what r u doin?"));
       return;
