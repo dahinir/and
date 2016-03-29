@@ -5,7 +5,7 @@
   "cookieSecret": "dfe52c1e-d6d7-4acf-a6dc-38ea1260c700",
   "remoting": {
     "context": {
-      "enableHttpContext": true
+      "enableHttpContext": false
     },
     "rest": {
       "normalizeHttpPath": false,
