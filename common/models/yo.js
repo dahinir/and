@@ -131,7 +131,7 @@ module.exports = function(Yo) {
           app.models.CompletedYo.create(mutualYo, function(err, models){
             console.log("[yo.js] created CompletedYo.");
           });
-          // Persist VeiledCompleteYo for notify.
+          // Persist VeiledCompleteYo for notify: will removed when notify
           app.models.VeiledCompleteYo.create(mutualYo, function(err, models){
             console.log("[yo.js] created VeiledCompleteYo.");
           });
