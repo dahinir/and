@@ -124,16 +124,26 @@ module.exports = function(Yo) {
           console.log("[yo.js] there is mutual yo!");
           var mutualYo = {
             provider: yoInstance.provider,
-            a: yoInstance.receiverId, // first yo
-            b: yoInstance.senderId
+            senderId: yoInstance.receiverId, // first yo
+            receiverId: yoInstance.senderId
           };
           // Persist CompletedYo for history of this service.
           app.models.CompletedYo.create(mutualYo, function(err, models){
-            console.log("[yo.js] created CompletedYo.");
+            if (err){
+              console.log("[yo.js] ERROR when create CompletedYo!");
+              console.log(err);
+            }else{
+              console.log("[yo.js] created CompletedYo.");
+            }
           });
           // Persist VeiledCompleteYo for notify: will removed when notify
           app.models.VeiledCompleteYo.create(mutualYo, function(err, models){
-            console.log("[yo.js] created VeiledCompleteYo.");
+            if (err){
+              console.log("[yo.js] ERROR when create VeiledCompletedYo!");
+              console.log(err);
+            }else{
+              console.log("[yo.js] created VeiledCompletedYo.");
+            }
           });
         }else{
           console.log("[yo.js] there is no mutual yo..");

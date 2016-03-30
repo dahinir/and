@@ -22,12 +22,12 @@
     "modified": "date"
   },
   "relations": {
-    "customer_a": {
+    "sender": {
       "type": "belongsTo",
       "model": "Customer",
       "foreignKey": "userId"
     },
-    "customer_b": {
+    "receiver": {
       "type": "belongsTo",
       "model": "Customer",
       "foreignKey": "userId"

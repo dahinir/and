@@ -156,7 +156,7 @@ app.middleware('session', loopback.session({
 	resave: true
 }));
 
-// passportjs attach `req.user` contains the authenticated user
+// passportjs attach [req.user] contains the authenticated user
 // Serialization and deserialization is only required if passport session is
 // enabled
 passportConfigurator.init();
