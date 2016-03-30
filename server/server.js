@@ -23,33 +23,21 @@ console.log("------");
 // http://docs.strongloop.com/display/public/LB/Upgrading+applications+to+use+phases
 //
 // Set up the /favicon.ico
-app.use(loopback.favicon());
+// app.use(loopback.favicon());
 
 // request pre-processing middleware
-app.use(loopback.compress());
+// app.use(loopback.compress());
 
 // Create a LoopBack context for all requests
 // http://docs.strongloop.com/display/public/LB/Using+current+context
-app.use(loopback.context());
+// app.use(loopback.context());
 
 
 
-// -- Add your pre-processing middleware here --
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
-/*
-* body-parser is a piece of express middleware that
-*   reads a form's input and stores it as a javascript
-*   object accessible through [req.body]
-*/
-var bodyParser = require('body-parser');
-// to support JSON-encoded bodies
-app.use(bodyParser.json());
-// to support URL-encoded bodies
-app.use(bodyParser.urlencoded({
-	extended: true
-}));
+
 
 // just for test
 var reqCallCount = 0;
@@ -117,13 +105,36 @@ boot(app, __dirname, function(err){
 	}
 });
 
+/*
+* body-parser is a piece of express middleware that
+*   reads a form's input and stores it as a javascript
+*   object accessible through [req.body]
+*/
+var bodyParser = require('body-parser');
+// to support JSON-encoded bodies
+app.middleware('parse', bodyParser.json());
+// to support URL-encoded bodies
+app.middleware('parse', bodyParser.urlencoded({
+  extended: true
+}));
+/**
+ * Flash messages for passport
+ *
+ * Setting the failureFlash option to true instructs Passport to flash an
+ * error message using the message given by the strategy's verify callback,
+ * if any. This is often the best approach, because the verify callback
+ * can make the most accurate determination of why authentication failed.
+ */
+var flash = require('express-flash');
+
+
 // The access token is only available after boot
 // but in 'http://docs.strongloop.com/display/public/LB/Making+authenticated+requests'
 // To use cookies for authentication, add the following to server.js (before boot):
 // http://apidocs.strongloop.com/loopback/#loopback-token
 // [req.accessToken] will attached by rest-api.js NOT THIS.
 // [req.signedCookies.access_token] will atached
-app.use(loopback.token({
+app.middleware('auth', loopback.token({
 	// this is defaults
 	// cookies: ['authorization'],
 	// headers: ['authorization', 'X-Access-Token'],
@@ -133,13 +144,13 @@ app.use(loopback.token({
 
 // Enable http session
 // Parse Cookie header and populate [req.cookies] with an object keyed by the cookie names. Optionally you may enable signed cookie support by passing a secret string, which assigns [req.secret] so it may be used by other middleware.
-app.use(loopback.cookieParser(app.get('cookieSecret')));
+app.middleware('session:before', loopback.cookieParser(app.get('cookieSecret')));
 
 // be sure to use express.session() before passport.session()
 // to ensure that the login session is restored in the correct order.
 // http://passportjs.org/guide/configure/
 // [req.session] attach!
-app.use(loopback.session({
+app.middleware('session', loopback.session({
 	secret: 'kittycat',
 	saveUninitialized: true,
 	resave: true
@@ -149,6 +160,7 @@ app.use(loopback.session({
 // Serialization and deserialization is only required if passport session is
 // enabled
 passportConfigurator.init();
+app.use(flash());	// We need flash messages to see passport errors
 passportConfigurator.setupModels({
 	userModel: app.models.Customer,
 	userIdentityModel: app.models.UserIdentity,
@@ -169,65 +181,7 @@ for (var s in passportConfig) {
 	passportConfigurator.configureProvider(s, c);
 }
 
-/*
- * 2. Configure request preprocessing
- *
- *  LoopBack support all express-compatible middleware.
- *
-app.use(loopback.logger(app.get('env') === 'development' ? 'dev' : 'default'));
-app.use(loopback.cookieParser(app.get('cookieSecret')));
-app.use(loopback.token({model: app.models.accessToken}));
-app.use(loopback.bodyParser());
-app.use(loopback.methodOverride());
-*/
 
-/*
- * EXTENSION POINT
- * Add your custom request-preprocessing middleware here.
- * Example:
- *   app.use(loopback.limit('5.5mb'))
- */
-
-/*
- * 3. Setup request handlers.
- *
-// LoopBack REST interface
-app.use(app.get('restApiRoot'), loopback.rest());
-
-// API explorer (if present)
-try {
-  var explorer = require('loopback-explorer')(app);
-  app.use('/explorer', explorer);
-  app.once('started', function(baseUrl) {
-    console.log('Browse your REST API at %s%s', baseUrl, explorer.route);
-  });
-} catch(e){
-  console.log(
-    'Run `npm install loopback-explorer` to enable the LoopBack explorer'
-  );
-}
-*/
-
-/*
- * EXTENSION POINT
- * Add your custom request-handling middleware here.
- * Example:
- *   app.use(function(req, resp, next) {
- *     if (req.url == '/status') {
- *       // send status response
- *     } else {
- *       next();
- *     }
- *   });
- */
-
-
-
-////////////////////////////////////
-// app.get(function(req, res, next){
-// 	console.log("asdfasdfasdf");
-// 	console.log(req.session);
-// });
 /*
  * 5. Add a basic application status route at the root `/`.
  *
@@ -331,58 +285,3 @@ function startPushServer() {
 }
 // startPushServer();
 /* noti end */
-
-
-// Let express routes handle requests that were not handled
-// by any of the middleware registered above.
-// This way LoopBack REST and API Explorer take precedence over
-// express routes.
-// app.use(app.router);
-
-// -- Mount static files here--
-// All static middleware should be registered at the end, as all requests
-// passing the static middleware are hitting the file system
-// Example:
-//   var path = require('path');
-//   app.use(loopback.static(path.resolve(__dirname, '../client')));
-app.use(loopback.static( path.resolve(__dirname, '../client') ));
-
-// Requests that get this far won't be handled
-// by any middleware. Convert them into a 404 error
-// that will be handled later down the chain.
-app.use(loopback.urlNotFound());
-
-
-
-/*
- * EXTENSION POINT
- * Add your custom error reporting middleware here
- * Example:
- *   app.use(function(err, req, resp, next) {
- *     console.log(req.url, ' failed: ', err.stack);
- *     next(err);
- *   });
- */
-// The ultimate error handler.
-app.use(loopback.errorHandler());
-
-/*
- * 6. Enable access control and token based authentication.
- */
-
-// var swaggerRemote = app.remotes().exports.swagger;
-// if (swaggerRemote) {
-// 	console.log("swaggerRemote!!");
-// 	swaggerRemote.requireToken = false;
-// }else{
-// 	console.log("none swaggerRemote. maybe loopback 1.xx??");
-// }
-
-// move to boot/authentication.js
-// app.enableAuth();
-
-/*
- * 7. Optionally start the server
- *
- * (only if this module is the main module)
- */
