@@ -1,5 +1,5 @@
 {
-  "name": "CompletedYo",
+  "name": "VeiledCompleteYo",
   "base": "PersistedModel",
   "properties": {
     "provider": {

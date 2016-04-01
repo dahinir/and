@@ -156,7 +156,7 @@ app.middleware('session', loopback.session({
 	resave: true
 }));
 
-// passportjs attach `req.user` contains the authenticated user
+// passportjs attach [req.user] contains the authenticated user
 // Serialization and deserialization is only required if passport session is
 // enabled
 passportConfigurator.init();
@@ -221,67 +221,42 @@ app.get('/auth/accessToken', function(req, res){
 });
 
 
-/* noti start */
-// var Notification = app.models.Notification;
-var Application = app.models.Application;
-// var PushModel = app.models.Push;
-
-function startPushServer() {
-// Pre-register an application that is ready to be used for testing.
-// You should tweak config options in ./config.js
-  var yotooApp = require("../yotoo-app");
-
-  updateOrCreateApp(function (err, appModel) {
-    if (err) throw err;
-    console.log('Application id: %j', appModel.id);
-  });
-
-//--- Helper functions ---
-  function updateOrCreateApp(cb) {
-    Application.findOne({
-        where: { name: yotooApp.name }
-      },
-      function (err, result) {
-        if (err) cb(err);
-        if (result) {
-          console.log('Updating application: ' + result.id);
-          // console.log(result.pushSettings.apns.certData);
-          // console.log('yotooApp:'+ JSON.stringify(yotooApp));
-          result.updateAttributes(yotooApp, cb);
-          // console.log('yotooApp:'+ JSON.stringify(result));
-        } else {
-					console.log("[] already?");
-          return registerApp(cb);
-        }
-      });
-  }
-  function registerApp(cb) {
-    console.log('Registering a new Application...');
-    // Hack to set the app id to a fixed value so that we don't have to change
-    // the client settings
-    Application.beforeSave = function (next) {
-      if(this.name === yotooApp.name) {
-        this.id = 'com.dasolute.yotoo';
+// persist Application for Notification
+function updateOrCreateApplication(cb) {
+	var yotooApp = require("../yotoo-app");
+	var Application = app.models.Application;
+  Application.findOne({
+      where: {
+        name: yotooApp.name
       }
-      next();
-    };
-    Application.register(
-      yotooApp.userId,  // 'put your developer id here',
-      yotooApp.name, //'put your unique application name here',
-      {
-        description: yotooApp.description,
-        pushSettings: yotooApp.pushSettings
-      },
-      function (err, app) {
-        if (err){
-          console.log(" register app error");
-          return cb(err);
-        }
-        console.log(" register app success");
-        return cb(null, app);
+    },
+    function(err, result) {
+      if (err) cb(err);
+      if (result) {
+        console.log('[server.js] Updating application: ' + result.id);
+        result.updateAttributes(yotooApp, cb);
+      } else {
+        console.log('[server.js] Registering a new Application...');
+        Application.register(
+          yotooApp.userId, // 'put your developer id here',
+          yotooApp.name, //'put your unique application name here',
+          {
+            description: yotooApp.description,
+            pushSettings: yotooApp.pushSettings
+          },
+          function(err, app) {
+            if (err) {
+              console.error("[server.js]  register app error");
+              return cb(err);
+            }
+            console.log("[server.js]  register app success");
+            return cb(null, app);
+          }
+        );
       }
-    );
-  }
+    });
 }
-// startPushServer();
-/* noti end */
+updateOrCreateApplication(function (err, appModel) {
+  if (err) throw err;
+  console.log('[server.js] Application id: %j', appModel.id);
+});

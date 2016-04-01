@@ -66,5 +66,9 @@
   "CompletedYo": {
     "dataSource": "db",
     "public": false
+  },
+  "VeiledCompleteYo": {
+    "dataSource": "db",
+    "public": false
   }
 }
