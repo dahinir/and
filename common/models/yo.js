@@ -112,7 +112,7 @@ module.exports = function(Yo) {
   Yo.afterRemote("create", function(ctx, yoInstance, next){
     console.log("[yo.js] afterRemote create. one!");
 
-    // Persist `CompletedYo` and `VeiledCompleteYo` if this yo is mutual.
+    // Persist `CompleteYo` and `VeiledCompleteYo` if this yo is mutual.
     Yo.findOne({
       where:{
         provider: yoInstance.provider,
@@ -124,25 +124,27 @@ module.exports = function(Yo) {
           console.log("[yo.js] there is mutual yo!");
           var mutualYo = {
             provider: yoInstance.provider,
-            senderId: yoInstance.receiverId, // first yo
-            receiverId: yoInstance.senderId
+            senderId: yoInstance.receiverId, // first yoed provider id
+            receiverId: yoInstance.senderId,
+            userId1: yo.userId, // first yoed customer id
+            userId2: yoInstance.userId
           };
-          // Persist CompletedYo for history of this service.
-          app.models.CompletedYo.create(mutualYo, function(err, models){
+          // Persist CompleteYo for history of this service.
+          app.models.CompleteYo.create(mutualYo, function(err, completeYo){
             if (err){
-              console.log("[yo.js] ERROR when create CompletedYo!");
+              console.log("[yo.js] ERROR when create CompleteYo!");
               console.log(err);
             }else{
-              console.log("[yo.js] created CompletedYo.");
+              console.log("[yo.js] created CompleteYo.");
             }
           });
           // Persist VeiledCompleteYo for notify: will removed when notify
-          app.models.VeiledCompleteYo.create(mutualYo, function(err, models){
+          app.models.VeiledCompleteYo.create(mutualYo, function(err, veiledCompleteYo){
             if (err){
-              console.log("[yo.js] ERROR when create VeiledCompletedYo!");
+              console.log("[yo.js] ERROR when create VeiledCompleteYo!");
               console.log(err);
             }else{
-              console.log("[yo.js] created VeiledCompletedYo.");
+              console.log("[yo.js] created VeiledCompleteYo.");
             }
           });
         }else{
@@ -157,6 +159,7 @@ module.exports = function(Yo) {
     console.log("[yo.js] afterRemote create. two!");
 
     // Send notification "somebody got yo!" for every created Yo.
+    // NOT ABOUT `completeYo`
     app.models.UserIdentity.findOne({where: {
       externalId: yoInstance.receiverId,
       "profile.provider": yoInstance.provider

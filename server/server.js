@@ -260,3 +260,21 @@ updateOrCreateApplication(function (err, appModel) {
   if (err) throw err;
   console.log('[server.js] Application id: %j', appModel.id);
 });
+
+
+// Unveil the VeiledCompleteYo
+var HOW_OFTEN_UNVEIL_COMPLETE_YO = (app.get('env') == "development") ? 2000 : 1000 * 60 * 30;
+var HOW_MANY_DEALS_AT_A_TIME = 100;
+function unveilCompleteYo(){
+	// console.log("haha"+HOW_OFTEN_UNVEIL_COMPLETE_YO);
+	app.models.VeiledCompleteYo.find({
+		limit: HOW_MANY_DEALS_AT_A_TIME
+	}, function(err, veiledCompleteYos){
+		var unveilCompleteYo =[];
+		veiledCompleteYos.forEach(function(veiledCompleteYo){
+			// console.log(veiledCompleteYo);
+			// app.models.Push.
+		});
+	});
+}
+setInterval(unveilCompleteYo, HOW_OFTEN_UNVEIL_COMPLETE_YO);

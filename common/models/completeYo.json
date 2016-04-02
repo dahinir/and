@@ -1,5 +1,5 @@
 {
-  "name": "CompletedYo",
+  "name": "CompleteYo",
   "base": "PersistedModel",
   "properties": {
     "provider": {
@@ -25,12 +25,12 @@
     "sender": {
       "type": "belongsTo",
       "model": "Customer",
-      "foreignKey": "userId"
+      "foreignKey": "userId1"
     },
     "receiver": {
       "type": "belongsTo",
       "model": "Customer",
-      "foreignKey": "userId"
+      "foreignKey": "userId2"
     }
   },
   "validations": [],
