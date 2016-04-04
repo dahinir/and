@@ -6,6 +6,11 @@
       "type": "string",
       "required": true
     },
+    "error": {
+      "type": "string",
+      "default": "NONE"
+    },
+    "message": "string",
     "created": "date"
   },
   "relations": {

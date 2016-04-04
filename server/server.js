@@ -263,24 +263,42 @@ updateOrCreateApplication(function (err, appModel) {
 
 
 // Unveil the VeiledCompleteYo
-var HOW_OFTEN_UNVEIL_COMPLETE_YO = (app.get('env') == "development") ? 2000 : 1000 * 60 * 30;
-var HOW_MANY_DEALS_AT_A_TIME = 100;
+var UNVEIL_COOL_DOWN = (app.get('env') == "development") ? 2000 : 1000 * 60 * 30;
+setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
 function unveilCompleteYo(){
-	// console.log("haha"+HOW_OFTEN_UNVEIL_COMPLETE_YO);
-	app.models.VeiledCompleteYo.find({
-		limit: HOW_MANY_DEALS_AT_A_TIME
-	}, function(err, veiledCompleteYos){
-		var unveilCompleteYo =[];
-		veiledCompleteYos.forEach(function(veiledCompleteYo) {
-		  // console.log(veiledCompleteYo);
-		  // app.models.Push.notifyByQuery({
-	    //   appId: "com.dasolute.yotoo",
-	    //   userId: veiledCompleteYo.userId1
-	    // }, notification,
-	    // function(e) {
-	    //   console.log("[yo.js] push notification has sent.");
-	    // });
+	// unveil complete yos one by one
+	app.models.VeiledCompleteYo.findOne({
+		where: {
+			error: "NONE"
+		}
+	}, function(err, veiledCompleteYo){
+		if(!veiledCompleteYo){
+			// cool down when all complete yos are unveiled
+			console.log("[yo.js] nothing to unveil. cool down for " + UNVEIL_COOL_DOWN);
+			setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
+			return;
+		}
+		notification = new app.models.Notification({
+			alert: " ☞ ☜ ",  // needs i18n
+			badge: 1
 		});
+	  app.models.Push.notifyByQuery({
+      appId: "com.dasolute.yotoo",
+      userId: veiledCompleteYo.userId
+    }, notification,
+    function(err) {
+      console.log("[yo.js] push notification has sent.");
+			if(err){
+				veiledCompleteYo.error = err.name;
+				veiledCompleteYo.message = err.message;
+				veiledCompleteYo.save(function(){
+					unveilCompleteYo();	// recursive call until
+				});
+			}else{
+				veiledCompleteYo.destroy(function(){
+					unveilCompleteYo();	// recursive call until
+				});
+			}
+    });
 	});
 }
-setInterval(unveilCompleteYo, HOW_OFTEN_UNVEIL_COMPLETE_YO);
