@@ -64,25 +64,10 @@ module.exports = function(Yo) {
           next(new Error("what are you doing?"));
           return;
         }
-        // find exist Yo
-        Yo.findOne({
-          where:{
-            provider: requestBody.provider,
-            senderId: requestBody.senderId,
-            receiverId: requestBody.receiverId
-          }},
-          function(err, yo){
-            if(yo){
-              // error if yo is exist
-              next(new Error("already exist yo"));
-            }else{
-              // success!
-              requestBody.userId = accessToken.userId;
-              requestBody.created = new Date();
-              next();
-            }
-            return;
-          });
+        // success!
+        requestBody.userId = accessToken.userId;
+        requestBody.created = new Date();
+        next();
       });
     });
   }); // end of Yo.beforeRemote()
