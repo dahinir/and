@@ -263,7 +263,7 @@ updateOrCreateApplication(function (err, appModel) {
 
 
 // Unveil the VeiledCompleteYo
-var UNVEIL_COOL_DOWN = (app.get('env') == "development") ? 2000 : 1000 * 60 * 30;
+var UNVEIL_COOL_DOWN = (app.get('env') == "development") ? 2000 : 1000 * 60 * 60;	// 1 hour
 setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
 function unveilCompleteYo(){
 	// unveil complete yos one by one
@@ -275,7 +275,7 @@ function unveilCompleteYo(){
 		if(!veiledCompleteYo){
 			// cool down when all complete yos are unveiled
 			// console.log("[server.js] nothing to unveil. cool down for " + UNVEIL_COOL_DOWN/1000 + "sec");
-			setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
+			setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN*Math.random());
 			return;
 		}
 		notification = new app.models.Notification({
@@ -292,11 +292,11 @@ function unveilCompleteYo(){
 				veiledCompleteYo.error = err.name;
 				veiledCompleteYo.message = err.message;
 				veiledCompleteYo.save(function(){
-					unveilCompleteYo();	// recursive call until
+					setTimeout(unveilCompleteYo, 0);	// recursive call
 				});
 			}else{
 				veiledCompleteYo.destroy(function(){
-					unveilCompleteYo();	// recursive call until
+					setTimeout(unveilCompleteYo, 0);	// recursive call
 				});
 			}
     });
