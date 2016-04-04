@@ -274,12 +274,12 @@ function unveilCompleteYo(){
 	}, function(err, veiledCompleteYo){
 		if(!veiledCompleteYo){
 			// cool down when all complete yos are unveiled
-			console.log("[server.js] nothing to unveil. cool down for " + UNVEIL_COOL_DOWN/1000 + "sec");
+			// console.log("[server.js] nothing to unveil. cool down for " + UNVEIL_COOL_DOWN/1000 + "sec");
 			setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
 			return;
 		}
 		notification = new app.models.Notification({
-			alert: " ☞ ☜ ",  // needs i18n
+			alert: " ☞💥☜ ",  // needs i18n ⧒🌟💥💦✨
 			badge: 1
 		});
 	  app.models.Push.notifyByQuery({
