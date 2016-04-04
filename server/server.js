@@ -271,9 +271,15 @@ function unveilCompleteYo(){
 		limit: HOW_MANY_DEALS_AT_A_TIME
 	}, function(err, veiledCompleteYos){
 		var unveilCompleteYo =[];
-		veiledCompleteYos.forEach(function(veiledCompleteYo){
-			// console.log(veiledCompleteYo);
-			// app.models.Push.
+		veiledCompleteYos.forEach(function(veiledCompleteYo) {
+		  // console.log(veiledCompleteYo);
+		  // app.models.Push.notifyByQuery({
+	    //   appId: "com.dasolute.yotoo",
+	    //   userId: veiledCompleteYo.userId1
+	    // }, notification,
+	    // function(e) {
+	    //   console.log("[yo.js] push notification has sent.");
+	    // });
 		});
 	});
 }

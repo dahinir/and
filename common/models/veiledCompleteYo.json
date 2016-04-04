@@ -6,31 +6,18 @@
       "type": "string",
       "required": true
     },
-    "senderId": {
-      "type":"string",
-      "required": true
-    },
-    "receiverId": {
-      "type":"string",
-      "required": true
-    },
-    "hide": "boolean",
-    "complete": "boolean",
-    "burn": "boolean",
-
-    "created": "date",
-    "modified": "date"
+    "created": "date"
   },
   "relations": {
-    "sender": {
+    "customer": {
       "type": "belongsTo",
       "model": "Customer",
-      "foreignKey": "userId1"
+      "foreignKey": "userId"
     },
-    "receiver": {
+    "opponent": {
       "type": "belongsTo",
       "model": "Customer",
-      "foreignKey": "userId2"
+      "foreignKey": "opponentId"
     }
   },
   "validations": [],

@@ -129,17 +129,29 @@ module.exports = function(Yo) {
             userId1: yo.userId, // first yoed customer id
             userId2: yoInstance.userId
           };
-          // Persist CompleteYo for history of this service.
-          app.models.CompleteYo.create(mutualYo, function(err, completeYo){
-            if (err){
+          // Persist CompleteYo(mutual yo) for history of this service.
+          app.models.CompleteYo.create({
+            provider: yoInstance.provider,
+            aId: yoInstance.receiverId, // first yoed provider id
+            bId: yoInstance.senderId
+          }, function(err, completeYo) {
+            if (err) {
               console.log("[yo.js] ERROR when create CompleteYo!");
               console.log(err);
-            }else{
+            } else {
               console.log("[yo.js] created CompleteYo.");
             }
           });
           // Persist VeiledCompleteYo for notify: will removed when notify
-          app.models.VeiledCompleteYo.create(mutualYo, function(err, veiledCompleteYo){
+          app.models.VeiledCompleteYo.create([{
+            provider: yoInstance.provider,
+            userId: yo.userId,
+            opponentId: yoInstance.userId
+          },{
+            provider: yoInstance.provider,
+            userId: yoInstance.userId,
+            opponentId: yo.userId
+          }], function(err, veiledCompleteYo){
             if (err){
               console.log("[yo.js] ERROR when create VeiledCompleteYo!");
               console.log(err);
@@ -179,8 +191,7 @@ module.exports = function(Yo) {
         Push.notifyByQuery({
           appId: "com.dasolute.yotoo",
           userId: userIdentity.userId
-        }, notification,
-        function(e){
+        }, notification, function(e){
           console.log("[yo.js] push notification has sent.");
         });
       }else{  // receiver has not account
