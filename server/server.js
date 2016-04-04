@@ -274,7 +274,7 @@ function unveilCompleteYo(){
 	}, function(err, veiledCompleteYo){
 		if(!veiledCompleteYo){
 			// cool down when all complete yos are unveiled
-			console.log("[yo.js] nothing to unveil. cool down for " + UNVEIL_COOL_DOWN);
+			console.log("[server.js] nothing to unveil. cool down for " + UNVEIL_COOL_DOWN/1000 + "sec");
 			setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
 			return;
 		}
@@ -287,7 +287,7 @@ function unveilCompleteYo(){
       userId: veiledCompleteYo.userId
     }, notification,
     function(err) {
-      console.log("[yo.js] push notification has sent.");
+      console.log("[server.js] yotoo! notification has sent to userId:"+ veiledCompleteYo.userId);
 			if(err){
 				veiledCompleteYo.error = err.name;
 				veiledCompleteYo.message = err.message;
