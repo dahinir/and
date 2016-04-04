@@ -260,3 +260,45 @@ updateOrCreateApplication(function (err, appModel) {
   if (err) throw err;
   console.log('[server.js] Application id: %j', appModel.id);
 });
+
+
+// Unveil the VeiledCompleteYo
+var UNVEIL_COOL_DOWN = (app.get('env') == "development") ? 2000 : 1000 * 60 * 30;
+setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
+function unveilCompleteYo(){
+	// unveil complete yos one by one
+	app.models.VeiledCompleteYo.findOne({
+		where: {
+			error: "NONE"
+		}
+	}, function(err, veiledCompleteYo){
+		if(!veiledCompleteYo){
+			// cool down when all complete yos are unveiled
+			console.log("[server.js] nothing to unveil. cool down for " + UNVEIL_COOL_DOWN/1000 + "sec");
+			setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
+			return;
+		}
+		notification = new app.models.Notification({
+			alert: " ☞ ☜ ",  // needs i18n
+			badge: 1
+		});
+	  app.models.Push.notifyByQuery({
+      appId: "com.dasolute.yotoo",
+      userId: veiledCompleteYo.userId
+    }, notification,
+    function(err) {
+      console.log("[server.js] yotoo! notification has sent to userId:"+ veiledCompleteYo.userId);
+			if(err){
+				veiledCompleteYo.error = err.name;
+				veiledCompleteYo.message = err.message;
+				veiledCompleteYo.save(function(){
+					unveilCompleteYo();	// recursive call until
+				});
+			}else{
+				veiledCompleteYo.destroy(function(){
+					unveilCompleteYo();	// recursive call until
+				});
+			}
+    });
+	});
+}

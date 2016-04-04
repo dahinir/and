@@ -1,0 +1,28 @@
+{
+  "name": "CompleteYo",
+  "base": "PersistedModel",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "required": true
+    },
+    "aId": {
+      "type":"string",
+      "required": true
+    },
+    "bId": {
+      "type":"string",
+      "required": true
+    },
+    "created": "date"
+  },
+  "validations": [],
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    }
+  ],
+  "methods": []
+}

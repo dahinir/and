@@ -64,25 +64,10 @@ module.exports = function(Yo) {
           next(new Error("what are you doing?"));
           return;
         }
-        // find exist Yo
-        Yo.findOne({
-          where:{
-            provider: requestBody.provider,
-            senderId: requestBody.senderId,
-            receiverId: requestBody.receiverId
-          }},
-          function(err, yo){
-            if(yo){
-              // error if yo is exist
-              next(new Error("already exist yo"));
-            }else{
-              // success!
-              requestBody.userId = accessToken.userId;
-              requestBody.created = new Date();
-              next();
-            }
-            return;
-          });
+        // success!
+        requestBody.userId = accessToken.userId;
+        requestBody.created = new Date();
+        next();
       });
     });
   }); // end of Yo.beforeRemote()
@@ -112,7 +97,7 @@ module.exports = function(Yo) {
   Yo.afterRemote("create", function(ctx, yoInstance, next){
     console.log("[yo.js] afterRemote create. one!");
 
-    // Persist `CompletedYo` and `VeiledCompleteYo` if this yo is mutual.
+    // Persist `CompleteYo` and `VeiledCompleteYo` if this yo is mutual.
     Yo.findOne({
       where:{
         provider: yoInstance.provider,
@@ -124,25 +109,39 @@ module.exports = function(Yo) {
           console.log("[yo.js] there is mutual yo!");
           var mutualYo = {
             provider: yoInstance.provider,
-            senderId: yoInstance.receiverId, // first yo
-            receiverId: yoInstance.senderId
+            senderId: yoInstance.receiverId, // first yoed provider id
+            receiverId: yoInstance.senderId,
+            userId1: yo.userId, // first yoed customer id
+            userId2: yoInstance.userId
           };
-          // Persist CompletedYo for history of this service.
-          app.models.CompletedYo.create(mutualYo, function(err, models){
-            if (err){
-              console.log("[yo.js] ERROR when create CompletedYo!");
+          // Persist CompleteYo(mutual yo) for history of this service.
+          app.models.CompleteYo.create({
+            provider: yoInstance.provider,
+            aId: yoInstance.receiverId, // first yoed provider id
+            bId: yoInstance.senderId
+          }, function(err, completeYo) {
+            if (err) {
+              console.log("[yo.js] ERROR when create CompleteYo!");
               console.log(err);
-            }else{
-              console.log("[yo.js] created CompletedYo.");
+            } else {
+              console.log("[yo.js] created CompleteYo.");
             }
           });
           // Persist VeiledCompleteYo for notify: will removed when notify
-          app.models.VeiledCompleteYo.create(mutualYo, function(err, models){
+          app.models.VeiledCompleteYo.create([{
+            provider: yoInstance.provider,
+            userId: yo.userId,
+            opponentId: yoInstance.userId
+          },{
+            provider: yoInstance.provider,
+            userId: yoInstance.userId,
+            opponentId: yo.userId
+          }], function(err, veiledCompleteYo){
             if (err){
-              console.log("[yo.js] ERROR when create VeiledCompletedYo!");
+              console.log("[yo.js] ERROR when create VeiledCompleteYo!");
               console.log(err);
             }else{
-              console.log("[yo.js] created VeiledCompletedYo.");
+              console.log("[yo.js] created VeiledCompleteYo.");
             }
           });
         }else{
@@ -157,6 +156,7 @@ module.exports = function(Yo) {
     console.log("[yo.js] afterRemote create. two!");
 
     // Send notification "somebody got yo!" for every created Yo.
+    // NOT ABOUT `completeYo`
     app.models.UserIdentity.findOne({where: {
       externalId: yoInstance.receiverId,
       "profile.provider": yoInstance.provider
@@ -176,8 +176,7 @@ module.exports = function(Yo) {
         Push.notifyByQuery({
           appId: "com.dasolute.yotoo",
           userId: userIdentity.userId
-        }, notification,
-        function(e){
+        }, notification, function(e){
           console.log("[yo.js] push notification has sent.");
         });
       }else{  // receiver has not account
