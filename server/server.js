@@ -309,6 +309,7 @@ function unveilCompleteYo(){
 							setTimeout(unveilCompleteYo, 0);	// recursive call
 						});
 					}else{
+						// successfully unveil yo!
 						veiledCompleteYo.destroy(function(){
 							setTimeout(unveilCompleteYo, 0);	// recursive call
 						});
@@ -324,9 +325,6 @@ function unveilCompleteYo(){
 				},{complete: true}, function(err, info){
 					// console.log("[server.js] make "+ info.count +" of yos are completed!");
 				});
-				// yos[0].complete = yos[1].complete = true;
-				// yos[0].save({validate:false});
-				// yos[1].save({validate:false});
 			}else{
 				// remove veiledCompleteYo, that yo is canceled
 				veiledCompleteYo.destroy(function(){
