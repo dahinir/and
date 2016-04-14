@@ -14,6 +14,7 @@
       "type":"string",
       "required": true
     },
+    "complete": "boolean",
     "hide": "boolean",
 
     "created": "date",

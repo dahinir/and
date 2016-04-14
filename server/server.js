@@ -263,7 +263,7 @@ updateOrCreateApplication(function (err, appModel) {
 
 
 // Unveil the VeiledCompleteYo
-var UNVEIL_COOL_DOWN = (app.get('env') == "development") ? 2000 : 1000 * 60 * 60;	// 1 hour
+var UNVEIL_COOL_DOWN = (app.get('env') == "development") ? 2000 : 1000 * 60 * 60;	// 2 sec or 1 hour
 setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
 function unveilCompleteYo(){
 	// unveil complete yos one by one
@@ -279,26 +279,61 @@ function unveilCompleteYo(){
 			return;
 		}
 		notification = new app.models.Notification({
-			alert: " ☞💥☜ ",  // needs i18n ⧒🌟💥💦✨
+			alert: " ☞ 💥 ☜",  // needs i18n ⧒🌟💥💦✨
 			badge: 1
 		});
-	  app.models.Push.notifyByQuery({
-      appId: "com.dasolute.yotoo",
-      userId: veiledCompleteYo.userId
-    }, notification,
-    function(err) {
-      console.log("[server.js] yotoo! notification has sent to userId:"+ veiledCompleteYo.userId);
-			if(err){
-				veiledCompleteYo.error = err.name;
-				veiledCompleteYo.message = err.message;
-				veiledCompleteYo.save(function(){
-					setTimeout(unveilCompleteYo, 0);	// recursive call
+
+		// MAKE SURE IF ORIGINAL YO IS STILL EXIST BEFORE THE YO COMPLETE.
+		app.models.Yo.find({
+			"limit": 2,	// for better speed
+			"where": {
+				"or": [
+					{"and": [{userId: veiledCompleteYo.aUserId}, {receiverId: veiledCompleteYo.bId}]},
+					{"and": [{userId: veiledCompleteYo.bUserId}, {receiverId: veiledCompleteYo.aId}]}
+				]
+			}
+		}, function(err, yos){
+			console.log("[server.js] found original yos for notification: "+ JSON.stringify(yos) );
+			if(yos.length === 2){
+				// push notification each other
+				app.models.Push.notifyByQuery({
+		      appId: "com.dasolute.yotoo",
+		      userId: veiledCompleteYo.userId
+		    }, notification,
+		    function(err) {
+		      console.log("[server.js] yotoo notification will send to userId:"+ veiledCompleteYo.aUserId + ", "+ veiledCompleteYo.bUserId);
+					if(err){
+						veiledCompleteYo.error = err.name;
+						veiledCompleteYo.message = err.message;
+						veiledCompleteYo.save(function(){
+							setTimeout(unveilCompleteYo, 0);	// recursive call
+						});
+					}else{
+						veiledCompleteYo.destroy(function(){
+							setTimeout(unveilCompleteYo, 0);	// recursive call
+						});
+					}
+		    });
+
+				// update the original yos's complete field to true
+				app.models.Yo.updateAll({
+					"or":[
+						{"and": [{"userId": veiledCompleteYo.aUserId}, {"receiverId": veiledCompleteYo.bId}]},
+						{"and": [{"userId": veiledCompleteYo.bUserId}, {"receiverId": veiledCompleteYo.aId}]}
+					]
+				},{complete: true}, function(err, info){
+					// console.log("[server.js] make "+ info.count +" of yos are completed!");
 				});
+				// yos[0].complete = yos[1].complete = true;
+				// yos[0].save({validate:false});
+				// yos[1].save({validate:false});
 			}else{
+				// remove veiledCompleteYo, that yo is canceled
 				veiledCompleteYo.destroy(function(){
 					setTimeout(unveilCompleteYo, 0);	// recursive call
 				});
 			}
-    });
+		});	// end of app.models.Yo.find()
+
 	});
 }

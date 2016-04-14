@@ -38,7 +38,7 @@ module.exports = function(Yo) {
     next();
   });
   Yo.beforeRemote('create', function(ctx, modelInstance, next){
-    console.log("[yo.js] beforeRemote create");
+    console.log("[yo.js] beforeRemote create 1");
     // console.log(ctx);
     // console.log("modelInstance");
     // console.log(modelInstance);
@@ -53,24 +53,44 @@ module.exports = function(Yo) {
       return;
     }
 
+    // validate request: must exist that userIdentity with `userId`, `externalId`, `profile.provider`
     Yo.getApp(function(err, app){
       app.models.UserIdentity.findOne({where: {
         userId: accessToken.userId,
         externalId: requestBody.senderId,
         "profile.provider": requestBody.provider
       }}, function(err, userIdentity){
-        // console.log(err);
         if(!userIdentity){
           next(new Error("what are you doing?"));
           return;
         }
         // success!
-        requestBody.userId = accessToken.userId;
+        requestBody.userId = userIdentity.userId;
         requestBody.created = new Date();
         next();
       });
     });
   }); // end of Yo.beforeRemote()
+  Yo.beforeRemote("create", function(ctx, modelInstance, next){
+    console.log("[yo.js] beforeRemote create 2");
+    var userId = ctx.req.accessToken.userId,
+      receiverId = ctx.req.body.receiverId,
+      provider = ctx.req.body.provider;
+
+    // validate for duplication of Yo
+    Yo.getApp(function(err, app){
+      app.models.Yo.findOne({where:{
+        userId: userId,
+        receiverId: receiverId,
+        provider: provider
+      }}, function(err, yo){
+        if(yo){
+          next(new Error("duplicated yo"));
+        }
+        next();
+      });
+    });
+  });
 
   // NOTHING
   Yo.observe("after save", function (ctx, next) {
@@ -80,6 +100,11 @@ module.exports = function(Yo) {
     // console.log("---ctx.data---");
     // console.log(ctx.data);
 
+    if(!ctx.instance){
+      console.log("[yo.js] this is internal call maybe?");
+      next();
+      return;
+    }
     if(ctx.instance.unyo){
       console.log("[yo.js] unyo! " + ctx.instance.unyo);
     }else{
@@ -97,23 +122,17 @@ module.exports = function(Yo) {
   Yo.afterRemote("create", function(ctx, yoInstance, next){
     console.log("[yo.js] afterRemote create. one!");
 
-    // Persist `CompleteYo` and `VeiledCompleteYo` if this yo is mutual.
+    // Persist `CompleteYo` and `VeiledCompleteYo` if there is opponentYo
     Yo.findOne({
       where:{
         provider: yoInstance.provider,
         senderId: yoInstance.receiverId,
         receiverId: yoInstance.senderId
       }},
-      function(err, yo){
-        if(yo){
+      function(err, opponentYo){
+        if(opponentYo){
           console.log("[yo.js] there is mutual yo!");
-          var mutualYo = {
-            provider: yoInstance.provider,
-            senderId: yoInstance.receiverId, // first yoed provider id
-            receiverId: yoInstance.senderId,
-            userId1: yo.userId, // first yoed customer id
-            userId2: yoInstance.userId
-          };
+
           // Persist CompleteYo(mutual yo) for history of this service.
           app.models.CompleteYo.create({
             provider: yoInstance.provider,
@@ -127,16 +146,24 @@ module.exports = function(Yo) {
               console.log("[yo.js] created CompleteYo.");
             }
           });
+
           // Persist VeiledCompleteYo for notify: will removed when notify
-          app.models.VeiledCompleteYo.create([{
+          app.models.VeiledCompleteYo.create({
             provider: yoInstance.provider,
-            userId: yo.userId,
-            opponentId: yoInstance.userId
-          },{
-            provider: yoInstance.provider,
-            userId: yoInstance.userId,
-            opponentId: yo.userId
-          }], function(err, veiledCompleteYo){
+            aId: yoInstance.receiverId, // first yoed provider id
+            bId: yoInstance.senderId,
+            aUserId: opponentYo.userId, // aId and aUserId is same person
+            bUserId: yoInstance.userId
+          }, function(err, veiledCompleteYo){
+          // app.models.VeiledCompleteYo.create([{
+          //   provider: yoInstance.provider,
+          //   userId: opponentYo.userId,
+          //   opponentId: yoInstance.userId
+          // },{
+          //   provider: yoInstance.provider,
+          //   userId: yoInstance.userId,
+          //   opponentId: opponentYo.userId
+          // }], function(err, veiledCompleteYo){
             if (err){
               console.log("[yo.js] ERROR when create VeiledCompleteYo!");
               console.log(err);
