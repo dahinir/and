@@ -2,6 +2,9 @@ module.exports = function(Customer) {
   var app = require('../../server/server');
 
   console.log("[customer.js] init");
+  Customer.observe("before save", function (ctx, next) {
+    // put customer.created = new Date();
+  });
 /*
   Customer.observe('access', function logQuery(ctx, next) {
     console.log("[customer.js] Customer.observe");

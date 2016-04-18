@@ -77,16 +77,14 @@ module.exports = function(Yo) {
       receiverId = ctx.req.body.receiverId,
       provider = ctx.req.body.provider;
 
-    // validate for duplication of Yo
+    // remove duplication Yo if exist
     Yo.getApp(function(err, app){
       app.models.Yo.findOne({where:{
         userId: userId,
         receiverId: receiverId,
         provider: provider
       }}, function(err, yo){
-        if(yo){
-          next(new Error("duplicated yo"));
-        }
+        yo && yo.destroy();
         next();
       });
     });
@@ -121,6 +119,9 @@ module.exports = function(Yo) {
 
   Yo.afterRemote("create", function(ctx, yoInstance, next){
     console.log("[yo.js] afterRemote create. one!");
+    next(); // call next() first for better response
+
+// if opponent user has yos more than 1,000 remove oldest yo.
 
     // Persist `CompleteYo` and `VeiledCompleteYo` if there is opponentYo
     Yo.findOne({
@@ -132,12 +133,14 @@ module.exports = function(Yo) {
       function(err, opponentYo){
         if(opponentYo){
           console.log("[yo.js] there is mutual yo!");
+          var now = new Date();
 
           // Persist CompleteYo(mutual yo) for history of this service.
           app.models.CompleteYo.create({
             provider: yoInstance.provider,
             aId: yoInstance.receiverId, // first yoed provider id
-            bId: yoInstance.senderId
+            bId: yoInstance.senderId,
+            created: now
           }, function(err, completeYo) {
             if (err) {
               console.log("[yo.js] ERROR when create CompleteYo!");
@@ -153,17 +156,9 @@ module.exports = function(Yo) {
             aId: yoInstance.receiverId, // first yoed provider id
             bId: yoInstance.senderId,
             aUserId: opponentYo.userId, // aId and aUserId is same person
-            bUserId: yoInstance.userId
+            bUserId: yoInstance.userId,
+            created: now
           }, function(err, veiledCompleteYo){
-          // app.models.VeiledCompleteYo.create([{
-          //   provider: yoInstance.provider,
-          //   userId: opponentYo.userId,
-          //   opponentId: yoInstance.userId
-          // },{
-          //   provider: yoInstance.provider,
-          //   userId: yoInstance.userId,
-          //   opponentId: opponentYo.userId
-          // }], function(err, veiledCompleteYo){
             if (err){
               console.log("[yo.js] ERROR when create VeiledCompleteYo!");
               console.log(err);
@@ -175,12 +170,12 @@ module.exports = function(Yo) {
           console.log("[yo.js] there is no mutual yo..");
         }
     });
-    next();
     console.log("[yo.js] afterRemote create. one end");
   });
 
   Yo.afterRemote("create", function(ctx, yoInstance, next){
     console.log("[yo.js] afterRemote create. two!");
+    next(); //call next() first for better response
 
     // Send notification "somebody got yo!" for every created Yo.
     // NOT ABOUT `completeYo`
@@ -211,8 +206,6 @@ module.exports = function(Yo) {
         console.log("[yo.js] recevier has not account of this service.");
       }
     });
-
-    next();
     console.log("[yo.js] afterRemote create. two end");
   }); // End of Yo.afterRemote("create", function(ctx, yoInstance, next){
 

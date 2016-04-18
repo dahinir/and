@@ -11,6 +11,11 @@
     }
   },
   "relations": {
+    "yos": {
+      "type": "hasMany",
+      "model": "Yo",
+      "foreignKey": "userId"
+    },
     "identities": {
       "type": "hasMany",
       "model": "UserIdentity",

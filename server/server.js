@@ -263,9 +263,22 @@ updateOrCreateApplication(function (err, appModel) {
 
 
 // Unveil the VeiledCompleteYo
-var UNVEIL_COOL_DOWN = (app.get('env') == "development") ? 2000 : 1000 * 60 * 60;	// 2 sec or 1 hour
+var UNVEIL_COOL_DOWN = (app.get('env') == "development") ? 5000 : 1000 * 60 * 60 * 5;	// 5 sec or 5 hour
 setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN);
 function unveilCompleteYo(){
+
+// new Promise(function(resolve, reject){
+// 	if (+new Date()%2 === 0) {
+// 		resolve("Stuff worked!");
+// 	}
+// 	else {
+// 		reject(Error("It broke"));
+// 	}
+// }).then(function (text) {
+// 	console.log(text);
+// }, function (error) {
+// 	console.error(error);
+// });
 	// unveil complete yos one by one
 	app.models.VeiledCompleteYo.findOne({
 		where: {
@@ -278,60 +291,104 @@ function unveilCompleteYo(){
 			setTimeout(unveilCompleteYo, UNVEIL_COOL_DOWN*Math.random());
 			return;
 		}
-		notification = new app.models.Notification({
-			alert: " ☞ 💥 ☜",  // needs i18n ⧒🌟💥💦✨
-			badge: 1
-		});
 
-		// MAKE SURE IF ORIGINAL YO IS STILL EXIST BEFORE THE YO COMPLETE.
-		app.models.Yo.find({
-			"limit": 2,	// for better speed
-			"where": {
-				"or": [
-					{"and": [{userId: veiledCompleteYo.aUserId}, {receiverId: veiledCompleteYo.bId}]},
-					{"and": [{userId: veiledCompleteYo.bUserId}, {receiverId: veiledCompleteYo.aId}]}
+		console.log("[server.js] this is an veiledCompleteYo below");
+		console.log(veiledCompleteYo);
+		app.models.Customer.find({
+			where:{
+				or:[
+					{id: veiledCompleteYo.aUserId},
+					{id: veiledCompleteYo.bUserId}
 				]
+			},
+			limit: 2,	// two customers
+			include: {
+				relation: "yos",
+				scope:{	// yos's scope
+					// limit: 2,	// this doesn't get 2 yos of customer each other.
+					order: "created DESC"	// recently yo first
+				}
 			}
-		}, function(err, yos){
-			console.log("[server.js] found original yos for notification: "+ JSON.stringify(yos) );
-			if(yos.length === 2){
-				// push notification each other
-				app.models.Push.notifyByQuery({
-		      appId: "com.dasolute.yotoo",
-		      userId: veiledCompleteYo.userId
-		    }, notification,
-		    function(err) {
-		      console.log("[server.js] yotoo notification will send to userId:"+ veiledCompleteYo.aUserId + ", "+ veiledCompleteYo.bUserId);
-					if(err){
-						veiledCompleteYo.error = err.name;
-						veiledCompleteYo.message = err.message;
-						veiledCompleteYo.save(function(){
-							setTimeout(unveilCompleteYo, 0);	// recursive call
-						});
-					}else{
-						// successfully unveil yo!
-						veiledCompleteYo.destroy(function(){
-							setTimeout(unveilCompleteYo, 0);	// recursive call
-						});
-					}
-		    });
+		}, function(err, customers){
+			if(err){
+				// save veiledCompleteYo with "error when find customer"
+				return;
+			}
+			if(customers && customers.length === 2){
+				var sameCount = 0;
+				customers.forEach(function(customer){
+					var until, limit = 3,	// Number of yos available
+						yos = customer.toJSON().yos,
+						receiverId = (customer.id.toString() == veiledCompleteYo.aUserId)?veiledCompleteYo.bId:veiledCompleteYo.aId;
 
-				// update the original yos's complete field to true
-				app.models.Yo.updateAll({
-					"or":[
-						{"and": [{"userId": veiledCompleteYo.aUserId}, {"receiverId": veiledCompleteYo.bId}]},
-						{"and": [{"userId": veiledCompleteYo.bUserId}, {"receiverId": veiledCompleteYo.aId}]}
-					]
-				},{complete: true}, function(err, info){
-					// console.log("[server.js] make "+ info.count +" of yos are completed!");
+					if(yos){
+						until = (yos.length > limit)?limit:yos.length;
+						for(var i = 0; i < until; i++){
+							if(yos[i].provider == veiledCompleteYo.provider &&
+								yos[i].receiverId == receiverId){
+									sameCount++;
+									break;	// break for `for`
+							}
+						}
+					}
 				});
+				if( sameCount === 2){
+					// yos is stil valid. go notification
+					var notification = new app.models.Notification({
+						alert: " ☞ 💥 ☜",  // needs i18n ⧒🌟💥💦✨
+						badge: 1
+					});
+					// push notification each other
+					app.models.Push.notifyByQuery({
+						or:[
+							{and:[{userId: veiledCompleteYo.aUserId},{appId: "com.dasolute.yotoo"}]},
+							{and:[{userId: veiledCompleteYo.bUserId},{appId: "com.dasolute.yotoo"}]}
+						]
+					}, notification,
+					function(err) {
+						console.log("[server.js] yotoo notification send to userId:"+ veiledCompleteYo.aUserId + ", "+ veiledCompleteYo.bUserId);
+						if(err){
+							veiledCompleteYo.error = err.name;
+							veiledCompleteYo.message = err.message;
+							veiledCompleteYo.save(function(){
+								setTimeout(unveilCompleteYo, 0);	// recursive call
+							});
+						}else{
+							// successfully unveil yo!
+							veiledCompleteYo.destroy(function(){
+								setTimeout(unveilCompleteYo, 0);	// recursive call
+							});
+						}
+					});
+
+					// update the original yos's complete field to true
+					app.models.Yo.updateAll({
+						"or":[
+							{"and": [{"userId": veiledCompleteYo.aUserId}, {"receiverId": veiledCompleteYo.bId}]},
+							{"and": [{"userId": veiledCompleteYo.bUserId}, {"receiverId": veiledCompleteYo.aId}]}
+						]
+					},{complete: true}, function(err, info){
+						// console.log("[server.js] make "+ info.count +" of yos are completed!");
+					});
+				}else{
+					// customer's yo might be expired
+					console.log("[server.js] one of customer's yo might be expired. sameCount: "+ sameCount);
+					// remove veiledCompleteYo, that yo is canceled
+					veiledCompleteYo.destroy(function(){
+						setTimeout(unveilCompleteYo, 0);	// recursive call
+					});
+				}
 			}else{
-				// remove veiledCompleteYo, that yo is canceled
+				// remove veiledCompleteYo, that customer has gone..
 				veiledCompleteYo.destroy(function(){
 					setTimeout(unveilCompleteYo, 0);	// recursive call
 				});
 			}
-		});	// end of app.models.Yo.find()
+			// customers && customers.forEach(function(customer){
+			// 	console.log(customer.toJSON());
+			// 	console.log(customer.toJSON().yos[0]);
+			// });
+		});	// end of `app.models.Customer.find()`
 
 	});
 }
